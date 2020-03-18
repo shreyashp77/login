@@ -1,5 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:login/crud.dart';
 
 import 'message.dart';
 import 'msg.dart';
@@ -13,6 +14,7 @@ class _AddEventState extends State<AddEvent> {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   final TextEditingController titleController = TextEditingController();
   final TextEditingController bodyController = TextEditingController();
+  final TextEditingController topicController = TextEditingController();
   final List<Message> messages = [];
 
   bool visible = false;
@@ -26,7 +28,9 @@ class _AddEventState extends State<AddEvent> {
     // Getting value from Controller
     String title = titleController.text;
     String body = bodyController.text;
+    String topic = topicController.text;
 
+    Crud().addEventData(title, body, topic);
     // Store all data with Param Name.
     //var data = {'title': title, 'body': body};
 
@@ -39,6 +43,9 @@ class _AddEventState extends State<AddEvent> {
             FlatButton(
               child: Text("OK"),
               onPressed: () {
+                titleController.clear();
+                bodyController.clear();
+                topicController.clear();
                 Navigator.of(context).pop();
                 setState(() {
                   visible = false;
@@ -64,10 +71,18 @@ class _AddEventState extends State<AddEvent> {
       onMessage: (Map<String, dynamic> message) async {
         print("onMessage: $message");
         final notification = message['notification'];
-        setState(() {
-          messages.add(Message(
-              title: notification['title'], body: notification['body']));
-        });
+        setState(
+          () {
+            messages.add(
+              Message(
+                // title: notification['title'],
+                // body: notification['body'],
+                title: '${notification['title']}',
+                body: '${notification['body']}',
+              ),
+            );
+          },
+        );
       },
       onLaunch: (Map<String, dynamic> message) async {
         print("onLaunch: $message");
@@ -104,6 +119,14 @@ class _AddEventState extends State<AddEvent> {
                   padding: const EdgeInsets.all(12.0),
                   child: Text('Enter the details ',
                       style: TextStyle(fontSize: 22))),
+              Container(
+                  width: 280,
+                  padding: EdgeInsets.all(10.0),
+                  child: TextField(
+                    controller: topicController,
+                    autocorrect: true,
+                    decoration: InputDecoration(hintText: 'Topic'),
+                  )),
               Container(
                   width: 280,
                   padding: EdgeInsets.all(10.0),

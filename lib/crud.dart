@@ -67,4 +67,13 @@ class Crud {
       print("admin removed");
     });
   }
+
+  addEventData(String title, String body, String topic) async {
+    DocumentReference documentRef =
+        Firestore.instance.collection("notifications").document(topic);
+    Firestore.instance.runTransaction((transaction) async {
+      await documentRef.setData({'Title': title, 'Body': body, 'Topic': topic});
+      print("Notification Data added!");
+    });
+  }
 }
