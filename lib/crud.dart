@@ -71,9 +71,24 @@ class Crud {
   addEventData(String title, String body, String topic) async {
     DocumentReference documentRef =
         Firestore.instance.collection("notifications").document(topic);
-    Firestore.instance.runTransaction((transaction) async {
-      await documentRef.setData({'Title': title, 'Body': body, 'Topic': topic});
-      print("Notification Data added!");
-    });
+    Firestore.instance.runTransaction(
+      (transaction) async {
+        await documentRef
+            .setData({'Title': title, 'Body': body, 'Topic': topic});
+        print("Notification Data added!");
+      },
+    );
+  }
+
+  deleteData(String topic) {
+    DocumentReference documentRef =
+        Firestore.instance.collection("notifications").document(topic);
+
+    Firestore.instance.runTransaction(
+      (transaction) async {
+        await documentRef.delete();
+        print("Notification Data added!");
+      },
+    );
   }
 }

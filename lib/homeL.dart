@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:login/adminpage.dart';
-import 'package:login/crud.dart';
-import 'package:login/welcome.dart';
 
 import 'normalusers.dart';
 
@@ -101,12 +99,14 @@ class _HomePageLState extends State<HomePageL> {
       child: RaisedButton(
         onPressed: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => AdminPage(
-                        widget._user,
-                        widget._googleSignIn,
-                      )));
+            context,
+            MaterialPageRoute(
+              builder: (context) => AdminPage(
+                widget._user,
+                widget._googleSignIn,
+              ),
+            ),
+          );
         },
         child: Text('Go to admins page'),
       ),

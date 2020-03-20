@@ -83,12 +83,14 @@ class _HomePageSState extends State<HomePageS> {
       child: RaisedButton(
         onPressed: () {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => AdminPage(
-                        widget._user,
-                        widget._googleSignIn,
-                      )));
+            context,
+            MaterialPageRoute(
+              builder: (context) => AdminPage(
+                widget._user,
+                widget._googleSignIn,
+              ),
+            ),
+          );
         },
         child: Text('Go to admins page'),
       ),
