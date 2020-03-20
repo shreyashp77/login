@@ -132,12 +132,14 @@ class _NormalUsersState extends State<NormalUsers> {
                   return ListView(
                     children: snapshot.data.documents
                         .map((DocumentSnapshot document) {
-                      return CustomCard(
-                        title: document['Title'],
-                        description: document['Body'],
-                        topic: document['Topic'],
-                        context: context,
-                        isAdmin: false,
+                      return Card(
+                        child: CustomCard(
+                          title: document['Title'],
+                          description: document['Body'],
+                          topic: document['Topic'],
+                          context: context,
+                          isAdmin: false,
+                        ),
                       );
                     }).toList(),
                   );

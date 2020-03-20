@@ -32,6 +32,8 @@ class _AdminPageState extends State<AdminPage> {
   TextEditingController taskDescripInputController;
   TextEditingController topicInputController;
 
+  final _fKey = GlobalKey<FormState>();
+
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   // final TextEditingController taskTitleInputController =
   //     TextEditingController();
@@ -56,52 +58,93 @@ class _AdminPageState extends State<AdminPage> {
     await showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        contentPadding: const EdgeInsets.all(16.0),
-        content: Column(
-          children: <Widget>[
-            Text("Please enter the details"),
-            Expanded(
-              child: TextField(
-                autofocus: true,
-                decoration: InputDecoration(labelText: 'Notification Title'),
-                controller: taskTitleInputController,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15))),
+        //contentPadding: const EdgeInsets.all(16.0),
+        content: Container(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Form(
+                key: _fKey,
+                child: Column(
+                  children: <Widget>[
+                    TextFormField(
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        hintText: 'Title',
+                      ),
+                      controller: taskTitleInputController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Title cannot be empty!';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: 'Body',
+                      ),
+                      controller: taskDescripInputController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Body cannot be empty!';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: 'Topic',
+                      ),
+                      controller: topicInputController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Topic cannot be empty!';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        FlatButton(
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                  color: Colors.red.shade400, fontSize: 15),
+                            ),
+                            onPressed: () {
+                              taskTitleInputController.clear();
+                              taskDescripInputController.clear();
+                              Navigator.pop(context);
+                            }),
+                        FlatButton(
+                            child: Text(
+                              'Add',
+                              style: TextStyle(
+                                  color: Colors.blue.shade400, fontSize: 15),
+                            ),
+                            onPressed: () {
+                              if (_fKey.currentState.validate()) {
+                                addEvent();
+                                sendNotification();
+                                Navigator.pop(context);
+                                taskTitleInputController.clear();
+                                taskDescripInputController.clear();
+                              }
+                            })
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: TextField(
-                decoration: InputDecoration(labelText: 'Notification Body'),
-                controller: taskDescripInputController,
-              ),
-            ),
-            Expanded(
-              child: TextField(
-                decoration: InputDecoration(labelText: 'Notification Topic'),
-                controller: topicInputController,
-              ),
-            )
-          ],
+            ],
+          ),
         ),
-        actions: <Widget>[
-          FlatButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                taskTitleInputController.clear();
-                taskDescripInputController.clear();
-                Navigator.pop(context);
-              }),
-          FlatButton(
-              child: Text('Add'),
-              onPressed: () {
-                if (taskDescripInputController.text.isNotEmpty &&
-                    taskTitleInputController.text.isNotEmpty) {
-                  addEvent();
-                  sendNotification();
-                  Navigator.pop(context);
-                  taskTitleInputController.clear();
-                  taskDescripInputController.clear();
-                }
-              })
-        ],
       ),
     );
   }
@@ -241,27 +284,21 @@ class _AdminPageState extends State<AdminPage> {
                 ),
               ),
             ),
-            // ListTile(
-            //   title: Text('Add Event'),
-            //   onTap: () {
-            //     Navigator.push(context,
-            //         MaterialPageRoute(builder: (context) => AddEvent()));
-            //   },
-            // ),
-
             ListTile(
               title: Text('Add/Remove Admin'),
               onTap: () {
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => MakeAdmin(
-                              widget._user,
-                              widget._googleSignIn,
-                            )));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MakeAdmin(
+                      widget._user,
+                      widget._googleSignIn,
+                    ),
+                  ),
+                );
               },
             ),
-            Divider(),
+            //Divider(),
             ListTile(
               title: Text('Logout'),
               onTap: () {
@@ -272,7 +309,7 @@ class _AdminPageState extends State<AdminPage> {
                 );
               },
             ),
-            Divider(),
+            //Divider(),
           ],
         ),
       ),
@@ -291,12 +328,14 @@ class _AdminPageState extends State<AdminPage> {
                   return ListView(
                     children: snapshot.data.documents
                         .map((DocumentSnapshot document) {
-                      return CustomCard(
-                        title: document['Title'],
-                        description: document['Body'],
-                        topic: document['Topic'],
-                        context: context,
-                        isAdmin: true,
+                      return Card(
+                        child: CustomCard(
+                          title: document['Title'],
+                          description: document['Body'],
+                          topic: document['Topic'],
+                          context: context,
+                          isAdmin: true,
+                        ),
                       );
                     }).toList(),
                   );

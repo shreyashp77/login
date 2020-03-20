@@ -33,8 +33,9 @@ class CustomCard extends StatefulWidget {
 
 class _CustomCardState extends State<CustomCard> {
   TextEditingController taskTitleInputController;
-
   TextEditingController taskDescripInputController;
+
+  final _fKey = GlobalKey<FormState>();
 
   _showEditDialog(String topic) async {
     //String title = taskTitleInputController.text;
@@ -52,53 +53,147 @@ class _CustomCardState extends State<CustomCard> {
     await showDialog<String>(
       context: widget.c1,
       builder: (BuildContext context) => AlertDialog(
-        contentPadding: const EdgeInsets.all(16.0),
-        content: Column(
-          children: <Widget>[
-            Text("Please enter the details"),
-            Expanded(
-              child: TextField(
-                autofocus: true,
-                decoration: InputDecoration(labelText: 'Notification Title'),
-                controller: taskTitleInputController,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15))),
+        //contentPadding: const EdgeInsets.all(16.0),
+        content: Container(
+          //height: 218,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Form(
+                key: _fKey,
+                child: Column(
+                  children: <Widget>[
+                    TextFormField(
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        hintText: 'Title',
+                      ),
+                      controller: taskTitleInputController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Title cannot be empty!';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 15),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: 'Body',
+                      ),
+                      controller: taskDescripInputController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Body cannot be empty!';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        FlatButton(
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(color: Colors.red.shade400),
+                          ),
+                          onPressed: () {
+                            if (taskDescripInputController.text.isNotEmpty &&
+                                taskTitleInputController.text.isNotEmpty) {
+                              taskTitleInputController.clear();
+                              taskDescripInputController.clear();
+                            }
+                            Navigator.pop(context);
+                          },
+                        ),
+                        SizedBox(width: 10),
+                        FlatButton(
+                          child: Text(
+                            'Edit',
+                            style: TextStyle(color: Colors.blue.shade400),
+                          ),
+                          onPressed: () {
+                            if (_fKey.currentState.validate()) {
+                              editEvent(topic);
+                              sendNotification();
+                              Navigator.pop(context);
+                              taskTitleInputController.clear();
+                              taskDescripInputController.clear();
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: TextField(
-                decoration: InputDecoration(labelText: 'Notification Body'),
-                controller: taskDescripInputController,
-              ),
-            ),
-            Expanded(
-              child: Text(topic),
-            )
-          ],
+            ],
+          ),
         ),
-        actions: <Widget>[
-          FlatButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                // if (taskDescripInputController.text.isNotEmpty &&
-                //     taskTitleInputController.text.isNotEmpty) {
-                //   taskTitleInputController.clear();
-                //   taskDescripInputController.clear();
-                // }
+      ),
+    );
+  }
 
-                Navigator.pop(context);
-              }),
-          FlatButton(
-              child: Text('Edit'),
-              onPressed: () {
-                if (taskDescripInputController.text.isNotEmpty &&
-                    taskTitleInputController.text.isNotEmpty) {
-                  editEvent(topic);
-                  sendNotification();
-                  Navigator.pop(context);
-                  taskTitleInputController.clear();
-                  taskDescripInputController.clear();
-                }
-              })
-        ],
+  _showAlertDialog(/*String topic*/) {
+    showDialog<String>(
+      context: widget.c1,
+      builder: (BuildContext context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20))),
+        content: Container(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Form(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Text(
+                      "Delete the event?",
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                    SizedBox(height: 40),
+                    Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        FlatButton(
+                          child: Text(
+                            'No',
+                            style: TextStyle(
+                                color: Colors.red.shade400, fontSize: 15),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        VerticalDivider(),
+                        FlatButton(
+                          child: Text(
+                            'Yes',
+                            style: TextStyle(
+                                color: Colors.blue.shade400, fontSize: 15),
+                          ),
+                          onPressed: () {
+                            Crud().deleteData(widget.topic);
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -121,7 +216,13 @@ class _CustomCardState extends State<CustomCard> {
             children: <Widget>[
               ListTile(
                 title: Text(widget.title),
-                subtitle: Text(widget.description),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(widget.description),
+                    Text('ghello'),
+                  ],
+                ),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -153,7 +254,8 @@ class _CustomCardState extends State<CustomCard> {
             color: Colors.red,
             icon: Icons.delete,
             onTap: () {
-              Crud().deleteData(widget.topic);
+              _showAlertDialog();
+              //Crud().deleteData(widget.topic);
             },
           ),
         ],
