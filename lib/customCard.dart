@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:login/adminpage.dart';
 import 'package:login/crud.dart';
@@ -35,6 +36,9 @@ class _CustomCardState extends State<CustomCard> {
   TextEditingController taskTitleInputController;
   TextEditingController taskDescripInputController;
 
+  String sdate = "Not set";
+  String stime = "Not set";
+
   final _fKey = GlobalKey<FormState>();
 
   _showEditDialog(String topic) async {
@@ -47,95 +51,257 @@ class _CustomCardState extends State<CustomCard> {
       String body = taskDescripInputController.text;
       //String topic = topicInputController.text;
 
-      Crud().addEventData(title, body, topic);
+      Crud().addEventData(title, body, topic, sdate, stime);
     }
 
     await showDialog<String>(
-      context: widget.c1,
-      builder: (BuildContext context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(15))),
-        //contentPadding: const EdgeInsets.all(16.0),
-        content: Container(
-          //height: 218,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Form(
-                key: _fKey,
-                child: Column(
-                  children: <Widget>[
-                    TextFormField(
-                      autofocus: true,
-                      decoration: InputDecoration(
-                        hintText: 'Title',
-                      ),
-                      controller: taskTitleInputController,
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return 'Title cannot be empty!';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 15),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: 'Body',
-                      ),
-                      controller: taskDescripInputController,
-                      validator: (value) {
-                        if (value.isEmpty) {
-                          return 'Body cannot be empty!';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 30),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        context: widget.c1,
+        builder: (BuildContext context) {
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(15))),
+              //contentPadding: const EdgeInsets.all(16.0),
+              content: Wrap(
+                children: <Widget>[
+                  Container(
+                    //height: 218,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        FlatButton(
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(color: Colors.red.shade400),
+                        Form(
+                          key: _fKey,
+                          child: Column(
+                            children: <Widget>[
+                              TextFormField(
+                                autofocus: true,
+                                decoration: InputDecoration(
+                                  hintText: 'Title',
+                                ),
+                                controller: taskTitleInputController,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Title cannot be empty!';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(height: 15),
+                              TextFormField(
+                                decoration: InputDecoration(
+                                  hintText: 'Body',
+                                ),
+                                controller: taskDescripInputController,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Body cannot be empty!';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              SizedBox(height: 15),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Text('Date: '),
+                                  FlatButton(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(5.0)),
+                                    //elevation: 4.0,
+                                    onPressed: () {
+                                      DatePicker.showDatePicker(context,
+                                          theme: DatePickerTheme(
+                                            containerHeight: 210.0,
+                                          ),
+                                          showTitleActions: true,
+                                          minTime: DateTime.now(),
+                                          maxTime: DateTime(2050, 12, 31),
+                                          onConfirm: (date) {
+                                        print('confirm $date');
+                                        sdate =
+                                            '${date.day} / ${date.month} / ${date.year}';
+                                        setState(() {
+                                          sdate =
+                                              '${date.day} / ${date.month} / ${date.year}';
+                                        });
+                                      },
+                                          currentTime: DateTime.now(),
+                                          locale: LocaleType.en);
+                                    },
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      height: 50.0,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Row(
+                                            children: <Widget>[
+                                              Container(
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    Icon(
+                                                      Icons.date_range,
+                                                      size: 15.0,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    Text(
+                                                      " $sdate",
+                                                      style: TextStyle(
+                                                          color: Colors.grey,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 15.0),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          // Text(
+                                          //   "  Change",
+                                          //   style: TextStyle(
+                                          //       color: Colors.teal,
+                                          //       fontWeight: FontWeight.bold,
+                                          //       fontSize: 15.0),
+                                          // ),
+                                        ],
+                                      ),
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                              // SizedBox(
+                              //   height: 10.0,
+                              // ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Text('Time: '),
+                                  FlatButton(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(5.0)),
+                                    //elevation: 4.0,
+                                    onPressed: () {
+                                      DatePicker.showTimePicker(context,
+                                          theme: DatePickerTheme(
+                                            containerHeight: 210.0,
+                                          ),
+                                          showTitleActions: true,
+                                          onConfirm: (time) {
+                                        print('confirm $time');
+                                        stime =
+                                            '${time.hour} : ${time.minute} : ${time.second}';
+                                        setState(() {
+                                          stime =
+                                              '${time.hour} : ${time.minute} : ${time.second}';
+                                        });
+                                      },
+                                          currentTime: DateTime.now(),
+                                          locale: LocaleType.en);
+                                      setState(() {});
+                                    },
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      height: 50.0,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Row(
+                                            children: <Widget>[
+                                              Container(
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    Icon(
+                                                      Icons.access_time,
+                                                      size: 15.0,
+                                                      color: Colors.grey,
+                                                    ),
+                                                    Text(
+                                                      " $stime",
+                                                      style: TextStyle(
+                                                          color: Colors.grey,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 15.0),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          // Text(
+                                          //   "  Change",
+                                          //   style: TextStyle(
+                                          //       color: Colors.teal,
+                                          //       fontWeight: FontWeight.bold,
+                                          //       fontSize: 18.0),
+                                          // ),
+                                        ],
+                                      ),
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              // SizedBox(height: 30),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  FlatButton(
+                                    child: Text(
+                                      'Cancel',
+                                      style:
+                                          TextStyle(color: Colors.red.shade400),
+                                    ),
+                                    onPressed: () {
+                                      if (taskDescripInputController
+                                              .text.isNotEmpty &&
+                                          taskTitleInputController
+                                              .text.isNotEmpty) {
+                                        taskTitleInputController.clear();
+                                        taskDescripInputController.clear();
+                                      }
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  SizedBox(width: 10),
+                                  FlatButton(
+                                    child: Text(
+                                      'Edit',
+                                      style: TextStyle(
+                                          color: Colors.blue.shade400),
+                                    ),
+                                    onPressed: () {
+                                      if (_fKey.currentState.validate()) {
+                                        editEvent(topic);
+                                        sendNotification();
+                                        Navigator.pop(context);
+                                        taskTitleInputController.clear();
+                                        taskDescripInputController.clear();
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          onPressed: () {
-                            if (taskDescripInputController.text.isNotEmpty &&
-                                taskTitleInputController.text.isNotEmpty) {
-                              taskTitleInputController.clear();
-                              taskDescripInputController.clear();
-                            }
-                            Navigator.pop(context);
-                          },
-                        ),
-                        SizedBox(width: 10),
-                        FlatButton(
-                          child: Text(
-                            'Edit',
-                            style: TextStyle(color: Colors.blue.shade400),
-                          ),
-                          onPressed: () {
-                            if (_fKey.currentState.validate()) {
-                              editEvent(topic);
-                              sendNotification();
-                              Navigator.pop(context);
-                              taskTitleInputController.clear();
-                              taskDescripInputController.clear();
-                            }
-                          },
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            );
+          });
+        });
   }
 
   _showAlertDialog(/*String topic*/) {
@@ -220,7 +386,6 @@ class _CustomCardState extends State<CustomCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(widget.description),
-                    Text('ghello'),
                   ],
                 ),
                 onTap: () {

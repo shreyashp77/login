@@ -47,12 +47,12 @@ class _MakeAdminState extends State<MakeAdmin> {
               SizedBox(
                 width: 20,
               ),
-              RaisedButton(
-                onPressed: () {
-                  removeAdmin();
-                },
-                child: Text('Remove Admin'),
-              ),
+              // RaisedButton(
+              //   onPressed: () {
+              //     removeAdmin();
+              //   },
+              //   child: Text('Remove Admin'),
+              // ),
             ],
           ),
         ],
@@ -74,17 +74,17 @@ class _MakeAdminState extends State<MakeAdmin> {
     });
   }
 
-  void removeAdmin() {
-    mail = controller.text;
-    Firestore.instance.collection('users').snapshots().listen((snapshot) {
-      snapshot.documents.forEach((doc) {
-        if (doc.data['Email'] == mail) {
-          //doc.data['admin'] = true;
-          uid = doc.data['uid'];
-          name = doc.data['Name'];
-          Crud().removeAdmin(name, mail, uid);
-        }
-      });
-    });
-  }
+  // void removeAdmin() {
+  //   mail = controller.text;
+  //   Firestore.instance.collection('users').snapshots().listen((snapshot) {
+  //     snapshot.documents.forEach((doc) {
+  //       if (doc.data['Email'] == mail) {
+  //         //doc.data['admin'] = true;
+  //         uid = doc.data['uid'];
+  //         name = doc.data['Name'];
+  //         Crud().removeAdmin(name, mail, uid);
+  //       }
+  //     });
+  //   });
+  // }
 }

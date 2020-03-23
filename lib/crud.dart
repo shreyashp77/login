@@ -58,23 +58,29 @@ class Crud {
     });
   }
 
-  removeAdmin(String name, String mail, String uid) async {
-    DocumentReference documentRef =
-        Firestore.instance.collection("users").document(uid);
-    Firestore.instance.runTransaction((transaction) async {
-      await documentRef
-          .setData({'Name': name, 'Email': mail, 'admin': false, 'uid': uid});
-      print("admin removed");
-    });
-  }
+  // removeAdmin(String name, String mail, String uid) async {
+  //   DocumentReference documentRef =
+  //       Firestore.instance.collection("users").document(uid);
+  //   Firestore.instance.runTransaction((transaction) async {
+  //     await documentRef
+  //         .setData({'Name': name, 'Email': mail, 'admin': false, 'uid': uid});
+  //     print("admin removed");
+  //   });
+  // }
 
-  addEventData(String title, String body, String topic) async {
+  addEventData(String title, String body, String topic, String sdate,
+      String stime) async {
     DocumentReference documentRef =
         Firestore.instance.collection("notifications").document(topic);
     Firestore.instance.runTransaction(
       (transaction) async {
-        await documentRef
-            .setData({'Title': title, 'Body': body, 'Topic': topic});
+        await documentRef.setData({
+          'Title': title,
+          'Body': body,
+          'Topic': topic,
+          'Date': sdate,
+          'Time': stime
+        });
         print("Notification Data added!");
       },
     );

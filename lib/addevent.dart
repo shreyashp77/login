@@ -30,7 +30,7 @@ class _AddEventState extends State<AddEvent> {
     String body = bodyController.text;
     String topic = topicController.text;
 
-    Crud().addEventData(title, body, topic);
+    //Crud().addEventData(title, body, topic);
     // Store all data with Param Name.
     //var data = {'title': title, 'body': body};
 
