@@ -86,6 +86,7 @@ class _NormalUsersState extends State<NormalUsers> {
       appBar: AppBar(
         title: Text('Welcome!'),
         centerTitle: true,
+        backgroundColor: Colors.orangeAccent,
       ),
       drawer: Drawer(
         child: ListView(
@@ -139,6 +140,8 @@ class _NormalUsersState extends State<NormalUsers> {
                           topic: document['Topic'],
                           context: context,
                           isAdmin: false,
+                          ndate: document['Date'],
+                          stime: document['Time'],
                         ),
                       );
                     }).toList(),

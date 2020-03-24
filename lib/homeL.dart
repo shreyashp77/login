@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:login/adminpage.dart';
+import 'package:login/signup.dart';
 
 import 'normalusers.dart';
 
@@ -24,66 +26,112 @@ class _HomePageLState extends State<HomePageL> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Welcome ${widget._user.displayName}'),
-        ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            StreamBuilder<DocumentSnapshot>(
-                stream: Firestore.instance
-                    .collection('users')
-                    .document(widget._user.uid)
-                    .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<DocumentSnapshot> snapshot) {
-                  if (snapshot.hasError) {
-                    return Text('Error : ${snapshot.error}');
-                  } else if (snapshot.hasData) {
-                    return checkRole(snapshot.data);
-                  }
-                  return LinearProgressIndicator();
-                }),
-            Center(
-              child: RaisedButton(
-                onPressed: () {
-                  widget._googleSignIn.signOut();
-                  Navigator.popUntil(context, ModalRoute.withName('home'));
-                },
-                child: Text('Logout'),
-              ),
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: /*[Colors.orange.shade300, Colors.orange.shade800]*/ [
+            Color(0xffFDC830),
+            Color(0xfffc4a1a)
           ],
-        ));
+        ),
+      ),
+      //color: Colors.white,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          CircleAvatar(
+            backgroundImage: NetworkImage(widget._user.photoUrl),
+            radius: 70,
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          Text(
+            'Welcome ${widget._user.displayName}!',
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+                decoration: TextDecoration.none),
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          StreamBuilder<DocumentSnapshot>(
+              stream: Firestore.instance
+                  .collection('users')
+                  .document(widget._user.uid)
+                  .snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Error : ${snapshot.error}');
+                } else if (snapshot.hasData) {
+                  return checkRole(snapshot.data);
+                }
+                return LinearProgressIndicator();
+              }),
+        ],
+      ),
+    );
   }
-
-  // Center checkRole(DocumentSnapshot snapshot) {
-  //   if (snapshot.data['admin'] == true)
-  //     return adminPage(snapshot);
-  //   else
-  //     return userPage(snapshot);
-  // }
-
-  // bool checkRole(DocumentSnapshot snapshot) {
-  //   if (snapshot.data['admin'] == true)
-  //     return true;
-  //   else
-  //     return false;
-  // }
-
-  // Center adminPage(DocumentSnapshot snapshot) {
-  //   return Center(child: Text('Admin'));
-  // }
-
-  // Center userPage(DocumentSnapshot snapshot) {
-  //   return Center(child: Text('Not Admin'));
-  // }
 
   Widget checkRole(DocumentSnapshot snapshot) {
     if (snapshot.data == null) {
       return Center(
-        child: Text('NO Data Found!'),
+        child: Column(
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'Looks like you haven\'t registered yet!',
+                  style: TextStyle(
+                    decoration: TextDecoration.none,
+                    fontSize: 15,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              'Please Register first!',
+              style: TextStyle(
+                decoration: TextDecoration.none,
+                fontSize: 15,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            ButtonTheme(
+              minWidth: 300,
+              child: OutlineButton(
+                shape: StadiumBorder(),
+                textColor: Colors.white,
+                borderSide: BorderSide(color: Colors.white),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Signup(),
+                        fullscreenDialog: true,
+                      ));
+                },
+                child: Text('Go to Registration Page'),
+
+                //child: Text('Google Sign-up'),
+              ),
+            ),
+          ],
+        ),
       );
     }
     if (snapshot.data['admin'] == true) {
@@ -95,38 +143,51 @@ class _HomePageLState extends State<HomePageL> {
 
   Widget adminPage(DocumentSnapshot snapshot) {
     return Center(
-      // child: Text('${snapshot.data['role']} ${snapshot.data['name']}'));
-      child: RaisedButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AdminPage(
-                widget._user,
-                widget._googleSignIn,
+      child: ButtonTheme(
+        minWidth: 300,
+        child: OutlineButton(
+          padding: EdgeInsets.symmetric(vertical: 15),
+          borderSide: BorderSide(color: Colors.white),
+          shape: StadiumBorder(),
+          textColor: Colors.white,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AdminPage(
+                  widget._user,
+                  widget._googleSignIn,
+                ),
               ),
-            ),
-          );
-        },
-        child: Text('Go to admins page'),
+            );
+          },
+          child: Text('Go to Admin\'s Dashboard'),
+        ),
       ),
     );
   }
 
   Widget userPage(DocumentSnapshot snapshot) {
-    // return Center(child: Text(snapshot.data['name']));
     return Center(
-      child: RaisedButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => NormalUsers(
-                        widget._user,
-                        widget._googleSignIn,
-                      )));
-        },
-        child: Text('Go to user page'),
+      child: ButtonTheme(
+        minWidth: 300,
+        child: OutlineButton(
+          padding: EdgeInsets.symmetric(vertical: 15),
+          borderSide: BorderSide(color: Colors.white),
+          shape: StadiumBorder(),
+          textColor: Colors.white,
+          color: Colors.orangeAccent,
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => NormalUsers(
+                          widget._user,
+                          widget._googleSignIn,
+                        )));
+          },
+          child: Text('Go to Dashboard'),
+        ),
       ),
     );
   }

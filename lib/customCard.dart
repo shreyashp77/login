@@ -19,7 +19,9 @@ class CustomCard extends StatefulWidget {
       @required this.description,
       @required this.topic,
       @required BuildContext context,
-      @required this.isAdmin}) {
+      @required this.isAdmin,
+      @required this.ndate,
+      @required this.stime}) {
     c1 = context;
   }
 
@@ -27,6 +29,8 @@ class CustomCard extends StatefulWidget {
   final description;
   final topic;
   final bool isAdmin;
+  final ndate;
+  final stime;
 
   @override
   _CustomCardState createState() => _CustomCardState();
@@ -52,6 +56,23 @@ class _CustomCardState extends State<CustomCard> {
       //String topic = topicInputController.text;
 
       Crud().addEventData(title, body, topic, sdate, stime);
+    }
+
+    String convertTo12h(String hr, String mn) {
+      int hrs = int.parse(hr);
+      String ap;
+      if (hrs > 12) {
+        hrs = hrs - 12;
+        ap = 'PM';
+      } else if (hrs == 12) {
+        ap = 'PM';
+      } else if (hrs == 0) {
+        hrs = 12;
+        ap = 'AM';
+      } else
+        ap = 'AM';
+
+      return (hrs.toString() + ':' + mn + ' ' + ap);
     }
 
     await showDialog<String>(
@@ -191,14 +212,16 @@ class _CustomCardState extends State<CustomCard> {
                                           theme: DatePickerTheme(
                                             containerHeight: 210.0,
                                           ),
+                                          showSecondsColumn: false,
                                           showTitleActions: true,
                                           onConfirm: (time) {
-                                        print('confirm $time');
-                                        stime =
-                                            '${time.hour} : ${time.minute} : ${time.second}';
+                                        stime = convertTo12h(
+                                            time.hour.toString(),
+                                            time.minute.toString());
                                         setState(() {
-                                          stime =
-                                              '${time.hour} : ${time.minute} : ${time.second}';
+                                          stime = convertTo12h(
+                                              time.hour.toString(),
+                                              time.minute.toString());
                                         });
                                       },
                                           currentTime: DateTime.now(),
@@ -277,7 +300,7 @@ class _CustomCardState extends State<CustomCard> {
                                     child: Text(
                                       'Edit',
                                       style: TextStyle(
-                                          color: Colors.blue.shade400),
+                                          color: Colors.orange.shade700),
                                     ),
                                     onPressed: () {
                                       if (_fKey.currentState.validate()) {
@@ -345,7 +368,7 @@ class _CustomCardState extends State<CustomCard> {
                           child: Text(
                             'Yes',
                             style: TextStyle(
-                                color: Colors.blue.shade400, fontSize: 15),
+                                color: Colors.orange.shade700, fontSize: 15),
                           ),
                           onPressed: () {
                             Crud().deleteData(widget.topic);
@@ -382,10 +405,11 @@ class _CustomCardState extends State<CustomCard> {
             children: <Widget>[
               ListTile(
                 title: Text(widget.title),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(widget.description),
+                    Text(widget.ndate),
+                    Text(widget.stime),
                   ],
                 ),
                 onTap: () {
@@ -393,9 +417,12 @@ class _CustomCardState extends State<CustomCard> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => DescriptionPage(
-                          title: widget.title,
-                          description: widget.description,
-                          topic: widget.topic),
+                        title: widget.title,
+                        description: widget.description,
+                        topic: widget.topic,
+                        ndate: widget.ndate,
+                        stime: widget.stime,
+                      ),
                     ),
                   );
                 },
@@ -406,7 +433,8 @@ class _CustomCardState extends State<CustomCard> {
         actions: <Widget>[
           new IconSlideAction(
             caption: 'Edit',
-            color: Colors.blue,
+            color: Colors.orangeAccent,
+            foregroundColor: Colors.white,
             icon: Icons.edit,
             onTap: () {
               _showEditDialog(widget.topic);
@@ -416,7 +444,7 @@ class _CustomCardState extends State<CustomCard> {
         secondaryActions: <Widget>[
           new IconSlideAction(
             caption: 'Delete',
-            color: Colors.red,
+            color: Colors.redAccent,
             icon: Icons.delete,
             onTap: () {
               _showAlertDialog();
@@ -433,15 +461,24 @@ class _CustomCardState extends State<CustomCard> {
           children: <Widget>[
             ListTile(
               title: Text(widget.title),
-              subtitle: Text(widget.description),
+              subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(widget.ndate),
+                  Text(widget.stime),
+                ],
+              ),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => DescriptionPage(
-                        title: widget.title,
-                        description: widget.description,
-                        topic: widget.topic),
+                      title: widget.title,
+                      description: widget.description,
+                      topic: widget.topic,
+                      ndate: widget.ndate,
+                      stime: widget.stime,
+                    ),
                   ),
                 );
               },

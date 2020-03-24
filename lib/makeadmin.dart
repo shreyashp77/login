@@ -21,28 +21,75 @@ class _MakeAdminState extends State<MakeAdmin> {
   String mail;
   String uid;
   String name;
+  final snackBar = SnackBar(content: Text('Email cannot be empty!'));
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Make Admin'),
         centerTitle: true,
+        backgroundColor: Colors.orangeAccent,
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          TextFormField(
-            autofocus: true,
-            controller: controller,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+            child: TextFormField(
+              autofocus: true,
+              controller: controller,
+              cursorColor: Colors.orangeAccent,
+              decoration: InputDecoration(
+                labelStyle: TextStyle(color: Colors.orangeAccent),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.orangeAccent,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 15,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              RaisedButton(
-                onPressed: () {
-                  makeAdmin();
-                },
-                child: Text('Add Admin'),
+              ButtonTheme(
+                minWidth: 250,
+                padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
+                child: RaisedButton(
+                  shape: StadiumBorder(),
+                  color: Colors.orangeAccent,
+                  onPressed: () {
+                    if (controller.text.isEmpty) {
+                      _scaffoldKey.currentState.showSnackBar(
+                        SnackBar(
+                          content: Text('Please enter a valid email!'),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                    } else {
+                      makeAdmin();
+                      controller.clear();
+                      //Navigator.pop(context);
+                      _scaffoldKey.currentState.showSnackBar(
+                        SnackBar(
+                          content: Text('Operation Successful!'),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                    }
+                  },
+                  child: Text(
+                    'Add Admin',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
               ),
               SizedBox(
                 width: 20,

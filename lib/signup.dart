@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:font_awesome_flutter/fa_icon.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'homeS.dart';
@@ -20,151 +22,42 @@ class _SignupState extends State<Signup> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('Signup'),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: /*[Colors.orange.shade300, Colors.orange.shade800]*/ [
+            Color(0xffFDC830),
+            Color(0xfffc4a1a)
+          ],
         ),
-        // body: Form(
-        //   key: _formKey,
-        //   child: Column(
-        //     children: <Widget>[
-        //       TextFormField(
-        //         validator: (input) {
-        //           if (input.isEmpty) {
-        //             return 'Email cannot be Empty!';
-        //           }
-        //         },
-        //         onSaved: (input) => _email = input,
-        //         decoration: InputDecoration(
-        //           labelText: 'Email',
-        //         ),
-        //       ),
-        //       TextFormField(
-        //         validator: (input) {
-        //           if (input.length < 6) {
-        //             return 'Password too short!';
-        //           }
-        //         },
-        //         onSaved: (input) => _pass = input,
-        //         decoration: InputDecoration(
-        //           labelText: 'Password',
-        //         ),
-        //         obscureText: true,
-        //       ),
-        //       RaisedButton(
-        //         onPressed: () {
-        //           signInWithGoogle().whenComplete(() {
-        //             Navigator.of(context).push(
-        //               MaterialPageRoute(
-        //                 builder: (context) {
-        //                   return Welcome();
-        //                 },
-        //               ),
-        //             );
-        //           });
-        //         },
-        //         child: Text('Submit'),
-        //       )
-        //     ],
-        //   ),
-        // ),
-        body: Center(
-          child: RaisedButton(
+      ),
+      child: Center(
+        child: ButtonTheme(
+          minWidth: 300,
+          child: OutlineButton(
+            shape: StadiumBorder(),
+            textColor: Colors.white,
+            borderSide: BorderSide(color: Colors.white),
             onPressed: () {
-              // Future<FirebaseUser> user = signInWithGoogle();
-
-              // signInWithGoogle().whenComplete(() {
-              //   Navigator.of(context).push(
-              //     MaterialPageRoute(
-              //       builder: (context) {
-              //         return HomePage(user: user);
-              //       },
-              //     ),
-              //   );
-              // });
-
               onGoogleSignIn(context);
-              // inputData(email, name);
-              // Crud crud = Crud();
-              // crud.addData({
-              //   'Name': '${name}',
-              //   'Email': '${email}',
-              //   'admin': false,
-              // });
             },
-            child: Text('Google Sign-up'),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                FaIcon(FontAwesomeIcons.googlePlusG),
+                SizedBox(width: 10),
+                Text('Sign up with Google'),
+              ],
+            ),
+            //child: Text('Google Sign-up'),
           ),
-        ));
+        ),
+      ),
+    );
   }
-
-  // Future<void> login() async {
-  //   final formState = _formKey.currentState;
-  //   if (formState.validate()) {
-  //     formState.save();
-  //     try {
-  //       AuthResult user = await FirebaseAuth.instance
-  //           .signInWithEmailAndPassword(email: _email, password: _pass);
-  //       if (user.user.isEmailVerified) {
-  //         // print(user.user.isEmailVerified);
-  //         Navigator.push(
-  //             context,
-  //             MaterialPageRoute(
-  //                 builder: (context) => HomePage(
-  //                       user: user,
-  //                     )));
-  //       } else {
-  //         showD();
-  //       }
-  //     } catch (e) {
-  //       print(e.message);
-  //     }
-  //   }
-  // }
-
-  // void showD() {
-  //   showDialog(
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         return AlertDialog(
-  //           title: Text('Email not verified yet'),
-  //           actions: <Widget>[
-  //             FlatButton(
-  //                 onPressed: () {
-  //                   Navigator.pop(context);
-  //                 },
-  //                 child: Text('OK')),
-  //           ],
-  //         );
-  //       });
-  // }
-
-  // Future<FirebaseUser> signInWithGoogle() async {
-  //   final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
-  //   final GoogleSignInAuthentication googleSignInAuthentication =
-  //       await googleSignInAccount.authentication;
-
-  //   final AuthCredential credential = GoogleAuthProvider.getCredential(
-  //     accessToken: googleSignInAuthentication.accessToken,
-  //     idToken: googleSignInAuthentication.idToken,
-  //   );
-
-  //   final AuthResult authResult = await _auth.signInWithCredential(credential);
-  //   final FirebaseUser user = authResult.user;
-
-  //   assert(!user.isAnonymous);
-  //   assert(await user.getIdToken() != null);
-
-  //   final FirebaseUser currentUser = await _auth.currentUser();
-  //   assert(user.uid == currentUser.uid);
-
-  //   return user;
-  // }
-
-  // void signOutGoogle() async {
-  //   await googleSignIn.signOut();
-
-  //   print("User Sign Out");
-  // }
 
   Future<FirebaseUser> _handleSignIn() async {
     // hold the instance of the authenticated user
@@ -198,11 +91,13 @@ class _SignupState extends State<Signup> {
       }
     });
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => HomePageS(
-                  user,
-                  _googleSignIn,
-                )));
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomePageS(
+          user,
+          _googleSignIn,
+        ),
+      ),
+    );
   }
 }

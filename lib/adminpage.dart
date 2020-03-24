@@ -59,6 +59,23 @@ class _AdminPageState extends State<AdminPage> {
       Crud().addEventData(title, body, topic, sdate, stime);
     }
 
+    String convertTo12h(String hr, String mn) {
+      int hrs = int.parse(hr);
+      String ap;
+      if (hrs > 12) {
+        hrs = hrs - 12;
+        ap = 'PM';
+      } else if (hrs == 12) {
+        ap = 'PM';
+      } else if (hrs == 0) {
+        hrs = 12;
+        ap = 'AM';
+      } else
+        ap = 'AM';
+
+      return (hrs.toString() + ':' + mn + ' ' + ap);
+    }
+
     await showDialog<String>(
       context: context,
       builder: (context) {
@@ -127,24 +144,26 @@ class _AdminPageState extends State<AdminPage> {
                                             BorderRadius.circular(5.0)),
                                     //elevation: 4.0,
                                     onPressed: () {
-                                      DatePicker.showDatePicker(context,
-                                          theme: DatePickerTheme(
-                                            containerHeight: 210.0,
-                                          ),
-                                          showTitleActions: true,
-                                          minTime: DateTime.now(),
-                                          maxTime: DateTime(2050, 12, 31),
-                                          onConfirm: (date) {
-                                        print('confirm $date');
-                                        sdate =
-                                            '${date.day} / ${date.month} / ${date.year}';
-                                        setState(() {
+                                      DatePicker.showDatePicker(
+                                        context,
+                                        theme: DatePickerTheme(
+                                          containerHeight: 210.0,
+                                        ),
+                                        showTitleActions: true,
+                                        minTime: DateTime.now(),
+                                        maxTime: DateTime(2050, 12, 31),
+                                        onConfirm: (date) {
+                                          print('confirm $date');
                                           sdate =
                                               '${date.day} / ${date.month} / ${date.year}';
-                                        });
-                                      },
-                                          currentTime: DateTime.now(),
-                                          locale: LocaleType.en);
+                                          setState(() {
+                                            sdate =
+                                                '${date.day} / ${date.month} / ${date.year}';
+                                          });
+                                        },
+                                        currentTime: DateTime.now(),
+                                        locale: LocaleType.en,
+                                      );
                                     },
                                     child: Container(
                                       alignment: Alignment.center,
@@ -208,13 +227,18 @@ class _AdminPageState extends State<AdminPage> {
                                             containerHeight: 210.0,
                                           ),
                                           showTitleActions: true,
+                                          showSecondsColumn: false,
                                           onConfirm: (time) {
-                                        print('confirm $time');
-                                        stime =
-                                            '${time.hour} : ${time.minute} : ${time.second}';
+                                        stime = convertTo12h(
+                                            time.hour.toString(),
+                                            time.minute.toString());
+
+                                        //stime = '${time.hour} : ${time.minute}';
                                         setState(() {
-                                          stime =
-                                              '${time.hour} : ${time.minute} : ${time.second}';
+                                          stime = convertTo12h(
+                                              time.hour.toString(),
+                                              time.minute.toString());
+                                          // '${time.hour} : ${time.minute}';
                                         });
                                       },
                                           currentTime: DateTime.now(),
@@ -286,7 +310,7 @@ class _AdminPageState extends State<AdminPage> {
                                       child: Text(
                                         'Add',
                                         style: TextStyle(
-                                            color: Colors.blue.shade400,
+                                            color: Colors.orangeAccent,
                                             fontSize: 15),
                                       ),
                                       onPressed: () {
@@ -296,6 +320,7 @@ class _AdminPageState extends State<AdminPage> {
                                           Navigator.pop(context);
                                           taskTitleInputController.clear();
                                           taskDescripInputController.clear();
+                                          topicInputController.clear();
                                         }
                                       })
                                 ],
@@ -432,6 +457,7 @@ class _AdminPageState extends State<AdminPage> {
       appBar: AppBar(
         title: Text('Administration Page'),
         centerTitle: true,
+        backgroundColor: Colors.orangeAccent,
       ),
       drawer: Drawer(
         child: ListView(
@@ -501,6 +527,8 @@ class _AdminPageState extends State<AdminPage> {
                           topic: document['Topic'],
                           context: context,
                           isAdmin: true,
+                          ndate: document['Date'],
+                          stime: document['Time'],
                         ),
                       );
                     }).toList(),
@@ -514,6 +542,7 @@ class _AdminPageState extends State<AdminPage> {
         onPressed: _showDialog,
         tooltip: 'Add',
         child: Icon(Icons.add),
+        backgroundColor: Colors.orangeAccent,
       ),
     );
   }
