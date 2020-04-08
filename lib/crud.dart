@@ -68,8 +68,10 @@ class Crud {
   //   });
   // }
 
-  addEventData(String title, String body, String topic, String sdate,
-      String stime) async {
+  addEventData(
+      String title, String body, String topic, String sdate, String stime,
+      {String url =
+          "https://thelivenagpur.com/wp-content/uploads/2019/08/IMG-20190821-WA0031.jpg"}) async {
     DocumentReference documentRef =
         Firestore.instance.collection("notifications").document(topic);
     Firestore.instance.runTransaction(
@@ -79,9 +81,33 @@ class Crud {
           'Body': body,
           'Topic': topic,
           'Date': sdate,
-          'Time': stime
+          'Time': stime,
+          'URL': url,
         });
         print("Notification Data added!");
+      },
+    );
+  }
+
+  editEventData(String topic,
+      {String title,
+      String body,
+      String sdate,
+      String stime,
+      String url}) async {
+    DocumentReference documentRef =
+        Firestore.instance.collection("notifications").document(topic);
+    Firestore.instance.runTransaction(
+      (transaction) async {
+        await documentRef.setData({
+          'Title': title,
+          if (body.isNotEmpty) 'Body': body,
+          'Topic': topic,
+          if (sdate != "Not set") 'Date': sdate,
+          if (stime != "NOt set") 'Time': stime,
+          if (url.isNotEmpty) 'URL': url,
+        });
+        print("Notification Data edited!");
       },
     );
   }

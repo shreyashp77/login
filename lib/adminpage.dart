@@ -1,11 +1,18 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:login/makeadmin.dart';
+import 'package:login/picker.dart';
+import 'package:path/path.dart' as Path;
 
+import 'addaudio.dart';
 import 'crud.dart';
 import 'customCard.dart';
 import 'message.dart';
@@ -36,6 +43,9 @@ class _AdminPageState extends State<AdminPage> {
   String sdate = "Not set";
   String stime = "Not set";
 
+  //var topic;
+  String imgUrl = "";
+
   final _fKey = GlobalKey<FormState>();
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -46,17 +56,22 @@ class _AdminPageState extends State<AdminPage> {
   // final TextEditingController topicInputController = TextEditingController();
   final List<Message> messages = [];
 
+  File sampleImage;
+
   _showDialog() async {
     //String title = taskTitleInputController.text;
     //String body = taskDescripInputController.text;
+
     String topic = topicInputController.text;
 
     Future addEvent() async {
       String title = taskTitleInputController.text;
       String body = taskDescripInputController.text;
       String topic = topicInputController.text;
-
-      Crud().addEventData(title, body, topic, sdate, stime);
+      if (imgUrl.isNotEmpty)
+        Crud().addEventData(title, body, topic, sdate, stime, url: imgUrl);
+      else
+        Crud().addEventData(title, body, topic, sdate, stime);
     }
 
     String convertTo12h(String hr, String mn) {
@@ -121,6 +136,7 @@ class _AdminPageState extends State<AdminPage> {
                                   return null;
                                 },
                               ),
+                              //notUploaded(),
                               TextFormField(
                                 decoration: InputDecoration(
                                   hintText: 'Topic',
@@ -131,6 +147,18 @@ class _AdminPageState extends State<AdminPage> {
                                     return 'Topic cannot be empty!';
                                   }
                                   return null;
+                                },
+                              ),
+                              SizedBox(height: 10),
+                              RaisedButton(
+                                elevation: 7.0,
+                                child: Text('Browse Image'),
+                                textColor: Colors.white,
+                                color: Colors.orangeAccent,
+                                onPressed: () {
+                                  getImage().then((v) => setState(() {
+                                        imgUrl = v;
+                                      }));
                                 },
                               ),
                               SizedBox(height: 15),
@@ -317,6 +345,7 @@ class _AdminPageState extends State<AdminPage> {
                                         if (_fKey.currentState.validate()) {
                                           addEvent();
                                           sendNotification();
+                                          //enableUpload(/*topic*/);
                                           Navigator.pop(context);
                                           taskTitleInputController.clear();
                                           taskDescripInputController.clear();
@@ -350,7 +379,8 @@ class _AdminPageState extends State<AdminPage> {
       String body = taskDescripInputController.text;
       //String topic = topicInputController.text;
 
-      //Crud().addEventData(title, body, topic);
+      Crud().editEventData(topic,
+          title: title, body: body, sdate: sdate, stime: stime);
     }
 
     await showDialog<String>(
@@ -389,14 +419,14 @@ class _AdminPageState extends State<AdminPage> {
           FlatButton(
               child: Text('Edit'),
               onPressed: () {
-                if (taskDescripInputController.text.isNotEmpty &&
-                    taskTitleInputController.text.isNotEmpty) {
-                  editEvent(topic);
-                  sendNotification();
-                  Navigator.pop(context);
-                  taskTitleInputController.clear();
-                  taskDescripInputController.clear();
-                }
+                // if (taskDescripInputController.text.isNotEmpty &&
+                //     taskTitleInputController.text.isNotEmpty) {
+                editEvent(topic);
+                sendNotification();
+                Navigator.pop(context);
+                taskTitleInputController.clear();
+                taskDescripInputController.clear();
+                //}
               })
         ],
       ),
@@ -490,6 +520,34 @@ class _AdminPageState extends State<AdminPage> {
                 );
               },
             ),
+            ListTile(
+              title: Text('Add Audio Stream'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddAudio(
+                      widget._user,
+                      widget._googleSignIn,
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Upload Image'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyHomePage(
+                        //widget._user,
+                        //widget._googleSignIn,
+                        ),
+                  ),
+                );
+              },
+            ),
             //Divider(),
             ListTile(
               title: Text('Logout'),
@@ -529,6 +587,7 @@ class _AdminPageState extends State<AdminPage> {
                           isAdmin: true,
                           ndate: document['Date'],
                           stime: document['Time'],
+                          url: document['URL'],
                         ),
                       );
                     }).toList(),
@@ -566,5 +625,27 @@ class _AdminPageState extends State<AdminPage> {
     print('Token: $fcmToken');
     // send key to your server to allow server to use
     // this token to send push notifications
+  }
+
+  Future<String> getImage() async {
+    var tempImage = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      sampleImage = tempImage;
+    });
+
+    final StorageReference firebaseStorageRef = FirebaseStorage.instance
+        .ref()
+        .child('/events/${Path.basename(sampleImage.path)}');
+    final StorageUploadTask task = firebaseStorageRef.putFile(sampleImage);
+
+    await task.onComplete;
+
+    print('File Uploaded');
+    final StorageTaskSnapshot downloadUrl = (await task.onComplete);
+    final String url = (await downloadUrl.ref.getDownloadURL());
+    //print('URL Is $url');
+
+    return url;
   }
 }

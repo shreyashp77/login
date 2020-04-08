@@ -21,7 +21,8 @@ class CustomCard extends StatefulWidget {
       @required BuildContext context,
       @required this.isAdmin,
       @required this.ndate,
-      @required this.stime}) {
+      @required this.stime,
+      this.url}) {
     c1 = context;
   }
 
@@ -31,6 +32,7 @@ class CustomCard extends StatefulWidget {
   final bool isAdmin;
   final ndate;
   final stime;
+  final url;
 
   @override
   _CustomCardState createState() => _CustomCardState();
@@ -54,7 +56,15 @@ class _CustomCardState extends State<CustomCard> {
       String title = taskTitleInputController.text;
       String body = taskDescripInputController.text;
       //String topic = topicInputController.text;
+      //print('title : ' + title);
+      //if (title.isNotEmpty) Crud().editEventData(topic, title: title);
+      // if (body != null) Crud().editEventData(topic, body: body);
+      // if (sdate != 'Not set') Crud().editEventData(topic, sdate: sdate);
+      // if (stime != 'Not set') Crud().editEventData(topic, stime: stime);
+      // Crud().editEventData(topic, url: 'asdf.com');
 
+      // Crud().editEventData(topic,
+      //     title: title, body: body, sdate: sdate, stime: stime);
       Crud().addEventData(title, body, topic, sdate, stime);
     }
 
@@ -96,7 +106,7 @@ class _CustomCardState extends State<CustomCard> {
                           child: Column(
                             children: <Widget>[
                               TextFormField(
-                                autofocus: true,
+                                //autofocus: true,
                                 decoration: InputDecoration(
                                   hintText: 'Title',
                                 ),
@@ -422,6 +432,7 @@ class _CustomCardState extends State<CustomCard> {
                         topic: widget.topic,
                         ndate: widget.ndate,
                         stime: widget.stime,
+                        url: widget.url,
                       ),
                     ),
                   );

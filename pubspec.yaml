@@ -32,6 +32,11 @@ dependencies:
   flutter_datetime_picker: any
   font_awesome_flutter: any
   google_fonts: any
+  chewie_audio: any
+  video_player: any
+  url_audio_stream: any
+  firebase_storage: any
+  image_picker: any
 
 dev_dependencies:
   flutter_test:
