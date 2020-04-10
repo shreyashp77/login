@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -42,6 +43,7 @@ class _AdminPageState extends State<AdminPage> {
 
   String sdate = "Not set";
   String stime = "Not set";
+  String category = "none";
 
   //var topic;
   String imgUrl = "";
@@ -58,6 +60,15 @@ class _AdminPageState extends State<AdminPage> {
 
   File sampleImage;
 
+  List<String> topics = const <String>[
+    't1',
+    't2',
+    't3',
+    't4',
+  ];
+
+  int _changedNumber = 0, _selectedNumber = 1;
+
   _showDialog() async {
     //String title = taskTitleInputController.text;
     //String body = taskDescripInputController.text;
@@ -69,9 +80,10 @@ class _AdminPageState extends State<AdminPage> {
       String body = taskDescripInputController.text;
       String topic = topicInputController.text;
       if (imgUrl.isNotEmpty)
-        Crud().addEventData(title, body, topic, sdate, stime, url: imgUrl);
+        Crud().addEventData(title, body, topic, sdate, stime, category,
+            url: imgUrl);
       else
-        Crud().addEventData(title, body, topic, sdate, stime);
+        Crud().addEventData(title, body, topic, sdate, stime, category);
     }
 
     String convertTo12h(String hr, String mn) {
@@ -150,10 +162,13 @@ class _AdminPageState extends State<AdminPage> {
                                 },
                               ),
                               SizedBox(height: 10),
-                              RaisedButton(
-                                elevation: 7.0,
-                                child: Text('Browse Image'),
-                                textColor: Colors.white,
+
+                              //Upload(),
+
+                              CupertinoButton(
+                                //elevation: 7.0,
+                                child: Text('Upload Image'),
+                                //textColor: Colors.white,
                                 color: Colors.orangeAccent,
                                 onPressed: () {
                                   getImage().then((v) => setState(() {
@@ -162,6 +177,116 @@ class _AdminPageState extends State<AdminPage> {
                                 },
                               ),
                               SizedBox(height: 15),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Text('Category: '),
+                                  FlatButton(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(5.0)),
+                                    //elevation: 4.0,
+                                    onPressed: () {
+                                      showModalBottomSheet(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return Container(
+                                              height: 200,
+                                              color: Colors.white,
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  CupertinoButton(
+                                                    child: Text("Cancel"),
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                  ),
+                                                  Expanded(
+                                                    child: CupertinoPicker(
+                                                      itemExtent: 32,
+                                                      scrollController:
+                                                          new FixedExtentScrollController(
+                                                        initialItem:
+                                                            _selectedNumber,
+                                                      ),
+                                                      backgroundColor:
+                                                          Colors.white,
+                                                      onSelectedItemChanged:
+                                                          (int index) {
+                                                        _changedNumber = index;
+                                                      },
+                                                      children:
+                                                          List<Widget>.generate(
+                                                              topics.length,
+                                                              (int idx) {
+                                                        return Center(
+                                                          child: new Text(
+                                                              topics[idx]),
+                                                        );
+                                                      }),
+                                                    ),
+                                                  ),
+                                                  CupertinoButton(
+                                                      child: Text("Ok"),
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          _selectedNumber =
+                                                              _changedNumber;
+                                                          category = topics[
+                                                              _selectedNumber];
+                                                        });
+                                                        Navigator.pop(context);
+                                                        print(category);
+                                                      }),
+                                                ],
+                                              ),
+                                            );
+                                          });
+                                    },
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      height: 50.0,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Row(
+                                            children: <Widget>[
+                                              Container(
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    Text(
+                                                      " $category",
+                                                      style: TextStyle(
+                                                          color: Colors.grey,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 15.0),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          // Text(
+                                          //   "  Change",
+                                          //   style: TextStyle(
+                                          //       color: Colors.teal,
+                                          //       fontWeight: FontWeight.bold,
+                                          //       fontSize: 15.0),
+                                          // ),
+                                        ],
+                                      ),
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
@@ -341,12 +466,14 @@ class _AdminPageState extends State<AdminPage> {
                                             color: Colors.orangeAccent,
                                             fontSize: 15),
                                       ),
-                                      onPressed: () {
+                                      onPressed: () async {
                                         if (_fKey.currentState.validate()) {
+                                          Navigator.pop(context);
+                                          await Future.delayed(
+                                              const Duration(seconds: 5));
                                           addEvent();
                                           sendNotification();
                                           //enableUpload(/*topic*/);
-                                          Navigator.pop(context);
                                           taskTitleInputController.clear();
                                           taskDescripInputController.clear();
                                           topicInputController.clear();
@@ -369,70 +496,6 @@ class _AdminPageState extends State<AdminPage> {
     );
   }
 
-  _showEditDialog(String topic) async {
-    //String title = taskTitleInputController.text;
-    //String body = taskDescripInputController.text;
-    //String topic = topicInputController.text;
-
-    Future editEvent(String topic) async {
-      String title = taskTitleInputController.text;
-      String body = taskDescripInputController.text;
-      //String topic = topicInputController.text;
-
-      Crud().editEventData(topic,
-          title: title, body: body, sdate: sdate, stime: stime);
-    }
-
-    await showDialog<String>(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        contentPadding: const EdgeInsets.all(16.0),
-        content: Column(
-          children: <Widget>[
-            Text("Please enter the details"),
-            Expanded(
-              child: TextField(
-                autofocus: true,
-                decoration: InputDecoration(labelText: 'Notification Title'),
-                controller: taskTitleInputController,
-              ),
-            ),
-            Expanded(
-              child: TextField(
-                decoration: InputDecoration(labelText: 'Notification Body'),
-                controller: taskDescripInputController,
-              ),
-            ),
-            Expanded(
-              child: Text('{$topic}'),
-            )
-          ],
-        ),
-        actions: <Widget>[
-          FlatButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                taskTitleInputController.clear();
-                taskDescripInputController.clear();
-                Navigator.pop(context);
-              }),
-          FlatButton(
-              child: Text('Edit'),
-              onPressed: () {
-                // if (taskDescripInputController.text.isNotEmpty &&
-                //     taskTitleInputController.text.isNotEmpty) {
-                editEvent(topic);
-                sendNotification();
-                Navigator.pop(context);
-                taskTitleInputController.clear();
-                taskDescripInputController.clear();
-                //}
-              })
-        ],
-      ),
-    );
-  }
-
   @override
   void initState() {
     taskTitleInputController = TextEditingController();
@@ -443,7 +506,7 @@ class _AdminPageState extends State<AdminPage> {
     _firebaseMessaging.onTokenRefresh.listen(sendTokenToServer);
     _firebaseMessaging.getToken();
 
-    _firebaseMessaging.subscribeToTopic('all');
+    //_firebaseMessaging.subscribeToTopic('all');
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
@@ -606,12 +669,71 @@ class _AdminPageState extends State<AdminPage> {
     );
   }
 
+  // Widget Upload() {
+  //   final StorageReference firebaseStorageRef = FirebaseStorage.instance
+  //       .ref()
+  //       .child('/events/${Path.basename(sampleImage.path)}');
+  //   final StorageUploadTask task = firebaseStorageRef.putFile(sampleImage);
+  //   if (task != null) {
+  //     /// Manage the task state and event subscription with a StreamBuilder
+  //     return StreamBuilder<StorageTaskEvent>(
+  //         stream: task.events,
+  //         builder: (_, snapshot) {
+  //           var event = snapshot?.data?.snapshot;
+
+  //           double progressPercent = event != null
+  //               ? event.bytesTransferred / event.totalByteCount
+  //               : 0;
+
+  //           return Column(
+  //             children: [
+  //               if (task.isComplete) Text('File uploaded!'),
+
+  //               if (task.isPaused)
+  //                 FlatButton(
+  //                   child: Icon(Icons.play_arrow),
+  //                   onPressed: task.resume,
+  //                 ),
+
+  //               if (task.isInProgress)
+  //                 FlatButton(
+  //                   child: Icon(Icons.pause),
+  //                   onPressed: task.pause,
+  //                 ),
+
+  //               // Progress bar
+  //               LinearProgressIndicator(value: progressPercent),
+  //               Text('${(progressPercent * 100).toStringAsFixed(2)} % '),
+  //             ],
+  //           );
+  //         });
+  //   } else {
+  //     // Allows user to decide when to start the upload
+  //     return RaisedButton(
+  //       elevation: 7.0,
+  //       child: Text('Browse Image'),
+  //       textColor: Colors.white,
+  //       color: Colors.orangeAccent,
+  //       onPressed: () {
+  //         getImage(task).then((v) => setState(() {
+  //               imgUrl = v;
+  //             }));
+  //       },
+  //     );
+  //   }
+  // }
+
   Future sendNotification() async {
-    final response = await Messaging.sendToAll(
-      title: taskTitleInputController.text,
-      body: taskDescripInputController.text,
-      // fcmToken: fcmToken,
-    );
+    final response = await Messaging.sendToTopic(
+        title: taskTitleInputController.text,
+        body: taskDescripInputController.text,
+        topic: category);
+
+    // sendToAll(
+    //   title: taskTitleInputController.text,
+    //   body: taskDescripInputController.text,
+    //   // fcmToken: fcmToken,
+    // );
 
     if (response.statusCode != 200) {
       Scaffold.of(context).showSnackBar(SnackBar(
@@ -639,6 +761,7 @@ class _AdminPageState extends State<AdminPage> {
         .child('/events/${Path.basename(sampleImage.path)}');
     final StorageUploadTask task = firebaseStorageRef.putFile(sampleImage);
 
+    if (task.isInProgress) CircularProgressIndicator();
     await task.onComplete;
 
     print('File Uploaded');

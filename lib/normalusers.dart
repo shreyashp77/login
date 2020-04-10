@@ -10,6 +10,7 @@ import 'customCard.dart';
 import 'makeadmin.dart';
 import 'message.dart';
 import 'msg.dart';
+import 'subscriptions.dart';
 
 class NormalUsers extends StatefulWidget {
   bool visible = false;
@@ -43,7 +44,7 @@ class _NormalUsersState extends State<NormalUsers> {
     _firebaseMessaging.onTokenRefresh.listen(sendTokenToServer);
     _firebaseMessaging.getToken();
 
-    _firebaseMessaging.subscribeToTopic('all');
+    //_firebaseMessaging.subscribeToTopic('all');
 
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
@@ -107,6 +108,20 @@ class _NormalUsersState extends State<NormalUsers> {
               ),
             ),
             ListTile(
+              title: Text('Subscriptions'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Subscriptions(
+                        //widget._user,
+                        //widget._googleSignIn,
+                        ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
               title: Text('Logout'),
               onTap: () {
                 widget._googleSignIn.signOut();
@@ -143,6 +158,7 @@ class _NormalUsersState extends State<NormalUsers> {
                           isAdmin: false,
                           ndate: document['Date'],
                           stime: document['Time'],
+                          url: document['URL'],
                         ),
                       );
                     }).toList(),
@@ -178,15 +194,3 @@ class _NormalUsersState extends State<NormalUsers> {
     // this token to send push notifications
   }
 }
-
-/*
-Center(
-        child: RaisedButton(
-          onPressed: () {
-            widget._googleSignIn.signOut();
-            Navigator.popUntil(context, ModalRoute.withName('home'));
-          },
-          child: Text('Logout'),
-        ),
-      ),
-*/

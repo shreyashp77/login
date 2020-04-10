@@ -37,6 +37,7 @@ dependencies:
   url_audio_stream: any
   firebase_storage: any
   image_picker: any
+  argon_buttons_flutter: ^1.0.2
 
 dev_dependencies:
   flutter_test:

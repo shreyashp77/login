@@ -1,11 +1,17 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:login/adminpage.dart';
 import 'package:login/crud.dart';
 import 'editpage.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:path/path.dart' as Path;
 
 import 'msg.dart';
 
@@ -45,6 +51,21 @@ class _CustomCardState extends State<CustomCard> {
   String sdate = "Not set";
   String stime = "Not set";
 
+  List<String> topics = const <String>[
+    't1',
+    't2',
+    't3',
+    't4',
+  ];
+
+  int _changedNumber = 0, _selectedNumber = 1;
+
+  String imgUrl = "";
+
+  File sampleImage;
+
+  String category = "none";
+
   final _fKey = GlobalKey<FormState>();
 
   _showEditDialog(String topic) async {
@@ -65,7 +86,7 @@ class _CustomCardState extends State<CustomCard> {
 
       // Crud().editEventData(topic,
       //     title: title, body: body, sdate: sdate, stime: stime);
-      Crud().addEventData(title, body, topic, sdate, stime);
+      //Crud().addEventData(title, body, topic, sdate, stime);
     }
 
     String convertTo12h(String hr, String mn) {
@@ -132,6 +153,132 @@ class _CustomCardState extends State<CustomCard> {
                                 },
                               ),
                               SizedBox(height: 15),
+                              CupertinoButton(
+                                //elevation: 7.0,
+                                child: Text('Upload Image'),
+                                //textColor: Colors.white,
+                                color: Colors.orangeAccent,
+                                onPressed: () {
+                                  getImage().then((v) => setState(() {
+                                        imgUrl = v;
+                                      }));
+                                },
+                              ),
+
+                              SizedBox(
+                                height: 15,
+                              ),
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Text('Category: '),
+                                  FlatButton(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(5.0)),
+                                    //elevation: 4.0,
+                                    onPressed: () {
+                                      showModalBottomSheet(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return Container(
+                                              height: 200,
+                                              color: Colors.white,
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  CupertinoButton(
+                                                    child: Text("Cancel"),
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                  ),
+                                                  Expanded(
+                                                    child: CupertinoPicker(
+                                                      itemExtent: 32,
+                                                      scrollController:
+                                                          new FixedExtentScrollController(
+                                                        initialItem:
+                                                            _selectedNumber,
+                                                      ),
+                                                      backgroundColor:
+                                                          Colors.white,
+                                                      onSelectedItemChanged:
+                                                          (int index) {
+                                                        _changedNumber = index;
+                                                      },
+                                                      children:
+                                                          List<Widget>.generate(
+                                                              topics.length,
+                                                              (int idx) {
+                                                        return Center(
+                                                          child: new Text(
+                                                              topics[idx]),
+                                                        );
+                                                      }),
+                                                    ),
+                                                  ),
+                                                  CupertinoButton(
+                                                      child: Text("Ok"),
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          _selectedNumber =
+                                                              _changedNumber;
+                                                          category = topics[
+                                                              _selectedNumber];
+                                                        });
+                                                        Navigator.pop(context);
+                                                        print(category);
+                                                      }),
+                                                ],
+                                              ),
+                                            );
+                                          });
+                                    },
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      height: 50.0,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Row(
+                                            children: <Widget>[
+                                              Container(
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    Text(
+                                                      " $category",
+                                                      style: TextStyle(
+                                                          color: Colors.grey,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 15.0),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          // Text(
+                                          //   "  Change",
+                                          //   style: TextStyle(
+                                          //       color: Colors.teal,
+                                          //       fontWeight: FontWeight.bold,
+                                          //       fontSize: 15.0),
+                                          // ),
+                                        ],
+                                      ),
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
@@ -489,6 +636,7 @@ class _CustomCardState extends State<CustomCard> {
                       topic: widget.topic,
                       ndate: widget.ndate,
                       stime: widget.stime,
+                      url: widget.url,
                     ),
                   ),
                 );
@@ -501,11 +649,10 @@ class _CustomCardState extends State<CustomCard> {
   }
 
   Future sendNotification() async {
-    final response = await Messaging.sendToAll(
-      title: taskTitleInputController.text,
-      body: taskDescripInputController.text,
-      // fcmToken: fcmToken,
-    );
+    final response = await Messaging.sendToTopic(
+        title: taskTitleInputController.text,
+        body: taskDescripInputController.text,
+        topic: category);
 
     if (response.statusCode != 200) {
       Scaffold.of(widget.c1).showSnackBar(SnackBar(
@@ -513,5 +660,28 @@ class _CustomCardState extends State<CustomCard> {
             Text('[${response.statusCode}] Error message: ${response.body}'),
       ));
     }
+  }
+
+  Future<String> getImage() async {
+    var tempImage = await ImagePicker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      sampleImage = tempImage;
+    });
+
+    final StorageReference firebaseStorageRef = FirebaseStorage.instance
+        .ref()
+        .child('/events/${Path.basename(sampleImage.path)}');
+    final StorageUploadTask task = firebaseStorageRef.putFile(sampleImage);
+
+    if (task.isInProgress) CircularProgressIndicator();
+    await task.onComplete;
+
+    print('File Uploaded');
+    final StorageTaskSnapshot downloadUrl = (await task.onComplete);
+    final String url = (await downloadUrl.ref.getDownloadURL());
+    //print('URL Is $url');
+
+    return url;
   }
 }
