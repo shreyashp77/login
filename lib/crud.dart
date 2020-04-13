@@ -68,8 +68,8 @@ class Crud {
   //   });
   // }
 
-  addEventData(String title, String body, String topic, String sdate,
-      String stime, String category,
+  addEventData(String title, String body, String topic, String desc,
+      String sdate, String stime, String category,
       {String url =
           "https://thelivenagpur.com/wp-content/uploads/2019/08/IMG-20190821-WA0031.jpg"}) async {
     DocumentReference documentRef =
@@ -80,6 +80,7 @@ class Crud {
           'Title': title,
           'Body': body,
           'Topic': topic,
+          'Description': desc,
           'Date': sdate,
           'Time': stime,
           'Category': category,

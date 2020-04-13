@@ -40,6 +40,7 @@ class _AdminPageState extends State<AdminPage> {
   TextEditingController taskTitleInputController;
   TextEditingController taskDescripInputController;
   TextEditingController topicInputController;
+  TextEditingController descInputController;
 
   String sdate = "Not set";
   String stime = "Not set";
@@ -67,7 +68,7 @@ class _AdminPageState extends State<AdminPage> {
     't4',
   ];
 
-  int _changedNumber = 0, _selectedNumber = 1;
+  int _changedNumber = 0, _selectedNumber = 0;
 
   _showDialog() async {
     //String title = taskTitleInputController.text;
@@ -79,11 +80,12 @@ class _AdminPageState extends State<AdminPage> {
       String title = taskTitleInputController.text;
       String body = taskDescripInputController.text;
       String topic = topicInputController.text;
+      String desc = descInputController.text;
       if (imgUrl.isNotEmpty)
-        Crud().addEventData(title, body, topic, sdate, stime, category,
+        Crud().addEventData(title, body, topic, desc, sdate, stime, category,
             url: imgUrl);
       else
-        Crud().addEventData(title, body, topic, sdate, stime, category);
+        Crud().addEventData(title, body, topic, desc, sdate, stime, category);
     }
 
     String convertTo12h(String hr, String mn) {
@@ -157,6 +159,19 @@ class _AdminPageState extends State<AdminPage> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Topic cannot be empty!';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              TextFormField(
+                                decoration: InputDecoration(
+                                  hintText: 'Description',
+                                ),
+                                controller: descInputController,
+                                maxLines: null,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Description cannot be empty!';
                                   }
                                   return null;
                                 },
@@ -477,6 +492,7 @@ class _AdminPageState extends State<AdminPage> {
                                           taskTitleInputController.clear();
                                           taskDescripInputController.clear();
                                           topicInputController.clear();
+                                          descInputController.clear();
                                         }
                                       })
                                 ],
@@ -501,6 +517,7 @@ class _AdminPageState extends State<AdminPage> {
     taskTitleInputController = TextEditingController();
     taskDescripInputController = TextEditingController();
     topicInputController = TextEditingController();
+    descInputController = TextEditingController();
     super.initState();
 
     _firebaseMessaging.onTokenRefresh.listen(sendTokenToServer);
@@ -651,6 +668,7 @@ class _AdminPageState extends State<AdminPage> {
                           ndate: document['Date'],
                           stime: document['Time'],
                           url: document['URL'],
+                          desc: document['Description'],
                         ),
                       );
                     }).toList(),
@@ -687,7 +705,7 @@ class _AdminPageState extends State<AdminPage> {
 
   //           return Column(
   //             children: [
-  //               if (task.isComplete) Text('File uploaded!'),
+  //               if (task.isComplete) Text('F.ile uploaded!'),
 
   //               if (task.isPaused)
   //                 FlatButton(

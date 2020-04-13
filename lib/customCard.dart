@@ -1,13 +1,13 @@
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+// import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:login/adminpage.dart';
+// import 'package:login/adminpage.dart';
 import 'package:login/crud.dart';
 import 'editpage.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -28,7 +28,8 @@ class CustomCard extends StatefulWidget {
       @required this.isAdmin,
       @required this.ndate,
       @required this.stime,
-      this.url}) {
+      this.url,
+      @required this.desc}) {
     c1 = context;
   }
 
@@ -39,6 +40,7 @@ class CustomCard extends StatefulWidget {
   final ndate;
   final stime;
   final url;
+  final desc;
 
   @override
   _CustomCardState createState() => _CustomCardState();
@@ -47,6 +49,7 @@ class CustomCard extends StatefulWidget {
 class _CustomCardState extends State<CustomCard> {
   TextEditingController taskTitleInputController;
   TextEditingController taskDescripInputController;
+  TextEditingController descInputController;
 
   String sdate = "Not set";
   String stime = "Not set";
@@ -58,7 +61,7 @@ class _CustomCardState extends State<CustomCard> {
     't4',
   ];
 
-  int _changedNumber = 0, _selectedNumber = 1;
+  int _changedNumber = 0, _selectedNumber = 0;
 
   String imgUrl = "";
 
@@ -76,6 +79,7 @@ class _CustomCardState extends State<CustomCard> {
     Future editEvent(String topic) async {
       String title = taskTitleInputController.text;
       String body = taskDescripInputController.text;
+      String desc = descInputController.text;
       //String topic = topicInputController.text;
       //print('title : ' + title);
       //if (title.isNotEmpty) Crud().editEventData(topic, title: title);
@@ -86,7 +90,11 @@ class _CustomCardState extends State<CustomCard> {
 
       // Crud().editEventData(topic,
       //     title: title, body: body, sdate: sdate, stime: stime);
-      //Crud().addEventData(title, body, topic, sdate, stime);
+      if (imgUrl.isNotEmpty)
+        Crud().addEventData(title, body, topic, desc, sdate, stime, category,
+            url: imgUrl);
+      else
+        Crud().addEventData(title, body, topic, desc, sdate, stime, category);
     }
 
     String convertTo12h(String hr, String mn) {
@@ -139,7 +147,7 @@ class _CustomCardState extends State<CustomCard> {
                                   return null;
                                 },
                               ),
-                              SizedBox(height: 15),
+                              // SizedBox(height: 15),
                               TextFormField(
                                 decoration: InputDecoration(
                                   hintText: 'Body',
@@ -148,6 +156,19 @@ class _CustomCardState extends State<CustomCard> {
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Body cannot be empty!';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              TextFormField(
+                                decoration: InputDecoration(
+                                  hintText: 'Description',
+                                ),
+                                controller: descInputController,
+                                maxLines: null,
+                                validator: (value) {
+                                  if (value.isEmpty) {
+                                    return 'Description cannot be empty!';
                                   }
                                   return null;
                                 },
@@ -548,6 +569,7 @@ class _CustomCardState extends State<CustomCard> {
   void initState() {
     taskTitleInputController = TextEditingController();
     taskDescripInputController = TextEditingController();
+    descInputController = TextEditingController();
     super.initState();
   }
 
@@ -580,6 +602,7 @@ class _CustomCardState extends State<CustomCard> {
                         ndate: widget.ndate,
                         stime: widget.stime,
                         url: widget.url,
+                        desc: widget.desc,
                       ),
                     ),
                   );
@@ -637,6 +660,7 @@ class _CustomCardState extends State<CustomCard> {
                       ndate: widget.ndate,
                       stime: widget.stime,
                       url: widget.url,
+                      desc: widget.desc,
                     ),
                   ),
                 );

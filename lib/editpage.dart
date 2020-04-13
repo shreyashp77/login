@@ -7,7 +7,8 @@ class DescriptionPage extends StatelessWidget {
       @required this.topic,
       @required this.ndate,
       @required this.stime,
-      this.url});
+      this.url,
+      @required this.desc});
 
   final title;
   final description;
@@ -15,6 +16,7 @@ class DescriptionPage extends StatelessWidget {
   final ndate;
   final stime;
   final url;
+  final desc;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +36,7 @@ class DescriptionPage extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20.0,
+                    // backgroundColor: Colors.black,
                   ),
                 ),
                 background: Image.network(
