@@ -18,11 +18,14 @@ class DescriptionPage extends StatelessWidget {
   final url;
   final desc;
 
+  ScrollController _scrollController;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          var tag1;
           return <Widget>[
             SliverAppBar(
               expandedHeight: 200.0,
@@ -36,7 +39,7 @@ class DescriptionPage extends StatelessWidget {
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20.0,
-                    // backgroundColor: Colors.black,
+                    // backgroundColor: Colors.orangeAccent,
                   ),
                 ),
                 background: Image.network(
@@ -47,8 +50,54 @@ class DescriptionPage extends StatelessWidget {
             ),
           ];
         },
-        body: Center(
-          child: Text(description),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(
+              height: 20,
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 0, 10),
+              child: Text(
+                description,
+                style: TextStyle(fontSize: 28),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    ndate,
+                    style: TextStyle(
+                      // fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 220,
+                  ),
+                  Text(
+                    stime,
+                    style: TextStyle(
+                      // fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.grey.shade700,
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 50,
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: Text(desc),
+            ),
+          ],
         ),
       ),
     );

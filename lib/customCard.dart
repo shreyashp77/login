@@ -12,6 +12,7 @@ import 'package:login/crud.dart';
 import 'editpage.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:path/path.dart' as Path;
+import 'package:getflutter/getflutter.dart';
 
 import 'msg.dart';
 
@@ -583,6 +584,12 @@ class _CustomCardState extends State<CustomCard> {
           child: Column(
             children: <Widget>[
               ListTile(
+                leading: GFAvatar(
+                  shape: GFAvatarShape.standard,
+                  size: 40,
+                  //radius: 25,
+                  backgroundImage: NetworkImage(widget.url),
+                ),
                 title: Text(widget.title),
                 subtitle: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -641,6 +648,12 @@ class _CustomCardState extends State<CustomCard> {
         child: Column(
           children: <Widget>[
             ListTile(
+              leading: GFAvatar(
+                shape: GFAvatarShape.standard,
+                size: 40,
+                //radius: 25,
+                backgroundImage: NetworkImage(widget.url),
+              ),
               title: Text(widget.title),
               subtitle: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

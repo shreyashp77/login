@@ -615,12 +615,12 @@ class _AdminPageState extends State<AdminPage> {
               },
             ),
             ListTile(
-              title: Text('Upload Image'),
+              title: Text('Upload Daily Darshan'),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MyHomePage(
+                    builder: (context) => DailyDarshan(
                         //widget._user,
                         //widget._googleSignIn,
                         ),

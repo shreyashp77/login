@@ -1,123 +1,281 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 //Image Plugin
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:login/demo.dart';
 import 'package:path/path.dart' as Path;
 
-class MyHomePage extends StatefulWidget {
+//import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+
+class DailyDarshan extends StatefulWidget {
   @override
-  _MyHomePageState createState() => new _MyHomePageState();
+  _DailyDarshanState createState() => new _DailyDarshanState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _DailyDarshanState extends State<DailyDarshan> {
   File sampleImage;
   String name;
   TextEditingController cont;
-  String uurl = "";
+  String imgUrl = "";
+  bool isLoaded;
 
-  Future<String> getImage() async {
+  void _clear() {
+    setState(() => sampleImage = null);
+  }
+
+  Future<void> getImage() async {
     var tempImage = await ImagePicker.pickImage(source: ImageSource.gallery);
 
     setState(() {
       sampleImage = tempImage;
     });
+  }
 
-    final StorageReference firebaseStorageRef = FirebaseStorage.instance
-        .ref()
-        .child('/events/${Path.basename(sampleImage.path)}');
-    final StorageUploadTask task = firebaseStorageRef.putFile(sampleImage);
+  List listUrl = [];
 
-    await task.onComplete;
+  String sdate = "Not set";
 
-    print('File Uploaded');
-    final StorageTaskSnapshot downloadUrl = (await task.onComplete);
-    final String url = (await downloadUrl.ref.getDownloadURL());
-    //print('URL Is $url');
+  @override
+  void initState() {
+    // checkAtStart().then((value) {
+    //   isLoaded = value;
+    // });
 
-    return url;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Image Upload'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Upload Daily Darshan'),
         centerTitle: true,
+        backgroundColor: Colors.orangeAccent,
       ),
-      body: new Center(
-        child: sampleImage == null
-            ? Text('Select an image')
-            : RaisedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Demo(
-                        url: uurl,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: <Widget>[
+          if (sampleImage != null) ...[
+            Center(
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.all(32),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black),
+                      ),
+                      child: Image.file(
+                        sampleImage,
+                        width: MediaQuery.of(context).size.width * .45,
                       ),
                     ),
-                  );
-                },
-                child: Text('GO'),
+                  ),
+                  ButtonTheme(
+                    child: Uploader(file: sampleImage),
+                  ),
+                  ButtonTheme(
+                    minWidth: MediaQuery.of(context).size.width * 0.4,
+                    child: FlatButton.icon(
+                      label: Text(
+                        "Delete",
+                        style: TextStyle(color: Colors.white),
+                      ),
+
+                      color: Colors.redAccent,
+                      icon: Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                      ),
+                      //shape: GFButtonShape.pills,
+                      onPressed: _clear,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
+                  ),
+                  ButtonTheme(
+                    minWidth: MediaQuery.of(context).size.width * 0.4,
+                    child: FlatButton.icon(
+                      label: Text(
+                        "View Images",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Demo(
+                                //url: imgUrl,
+                                ),
+                          ),
+                        );
+                        _clear();
+                      },
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      color: Colors.blueAccent,
+                      icon: Icon(Icons.view_compact, color: Colors.white),
+                    ),
+                  ),
+                ],
               ),
-        // : Image.network(uploadedFileURL), //enableUpload(),
-      ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: () {
-          getImage().then((v) => setState(() {
-                uurl = v;
-              }));
-        },
-        tooltip: 'Add Image',
-        child: new Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
-
-  // Widget enableUpload() {
-  //   return Container(
-  //     child: Column(
-  //       children: <Widget>[
-  //         Image.file(sampleImage, height: 300.0, width: 300.0),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  Widget enableUpload() {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          Image.file(sampleImage, height: 300.0, width: 300.0),
-          TextFormField(
-            decoration: InputDecoration(
-              hintText: 'Title',
             ),
-            controller: cont,
-          ),
-          RaisedButton(
-            elevation: 7.0,
-            child: Text('Upload'),
-            textColor: Colors.white,
-            color: Colors.blue,
-            onPressed: () {
-              setState(() {
-                name = cont.text;
-              });
-
-              final StorageReference firebaseStorageRef =
-                  FirebaseStorage.instance.ref().child('/events/$name.jpg');
-              final StorageUploadTask task =
-                  firebaseStorageRef.putFile(sampleImage);
-            },
-          )
+          ] else ...[
+            Center(
+              child: Text('No Image Selected!'),
+            ),
+          ]
         ],
       ),
+      floatingActionButton: new FloatingActionButton(
+        backgroundColor: Colors.orangeAccent,
+        onPressed: () {
+          getImage();
+          // then((v) => setState(() {
+          //       imgUrl = v;
+          //       addTo(imgUrl);
+          //     }));
+          //addTo(imgUrl);
+        },
+        tooltip: 'Add Image',
+        child: new Icon(Icons.add_photo_alternate),
+      ),
     );
+  }
+}
+
+class Uploader extends StatefulWidget {
+  final File file;
+
+  const Uploader({Key key, this.file}) : super(key: key);
+  @override
+  _UploaderState createState() => _UploaderState();
+}
+
+class _UploaderState extends State<Uploader> {
+  File sampleImage;
+  final FirebaseStorage _storage =
+      FirebaseStorage(storageBucket: 'gs://login-demo-8c251.appspot.com');
+
+  StorageUploadTask _uploadTask;
+
+  String imgUrl = "";
+
+  @override
+  Widget build(BuildContext context) {
+    if (_uploadTask != null) {
+      return StreamBuilder<StorageTaskEvent>(
+        stream: _uploadTask.events,
+        builder: (context, snapshot) {
+          var event = snapshot?.data?.snapshot;
+
+          double progressPercent =
+              event != null ? event.bytesTransferred / event.totalByteCount : 0;
+
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (_uploadTask.isComplete)
+                Text('Image Uploaded Successfully!',
+                    style: TextStyle(
+                        // color: Colors.greenAccent,
+                        height: 2,
+                        fontSize: 20)),
+              if (_uploadTask.isInProgress)
+                Column(
+                  children: <Widget>[
+                    LinearProgressIndicator(value: progressPercent),
+                    Text(
+                      '${(progressPercent * 100).toStringAsFixed(2)} % ',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ],
+                ),
+            ],
+          );
+        },
+      );
+    } else {
+      return Column(
+        children: <Widget>[
+          ButtonTheme(
+            minWidth: MediaQuery.of(context).size.width * 0.4,
+            child: FlatButton.icon(
+                color: Colors.blue,
+                label: Text(
+                  'Upload',
+                  style: TextStyle(color: Colors.white),
+                ),
+                icon: Icon(
+                  Icons.cloud_upload,
+                  color: Colors.white,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                onPressed: () {
+                  startUpload().then((v) => setState(() {
+                        imgUrl = v;
+                        addTo(imgUrl);
+                      }));
+                  //addTo(imgUrl);
+
+                  //addTo(imgUrl);
+                }),
+          ),
+        ],
+      );
+    }
+  }
+
+  Future<String> startUpload() async {
+    String filePath = '/daily/${Path.basename(widget.file.path)}';
+
+    setState(() {
+      _uploadTask = _storage.ref().child(filePath).putFile(widget.file);
+    });
+    final StorageTaskSnapshot downloadUrl = (await _uploadTask.onComplete);
+    final String url = (await downloadUrl.ref.getDownloadURL());
+
+    return url;
+  }
+
+  addTo(String url) async {
+    var now = DateTime.now();
+    String date = DateFormat('dd-MM-yyyy').format(now);
+    DocumentReference documentRef =
+        Firestore.instance.collection("daily").document(date);
+
+    final ss =
+        await Firestore.instance.collection("daily").document(date).get();
+    if (ss.exists) {
+      Firestore.instance.runTransaction(
+        (transaction) async {
+          await documentRef.updateData({
+            'url': FieldValue.arrayUnion([url])
+          });
+          print("daily darshan Data added!");
+        },
+      );
+    } else {
+      Firestore.instance.runTransaction(
+        (transaction) async {
+          await documentRef.setData({
+            'url': FieldValue.arrayUnion([url])
+          });
+          print("daily darshan Data added!");
+        },
+      );
+    }
   }
 }
