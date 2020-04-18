@@ -16,7 +16,7 @@ class Demo extends StatefulWidget {
 class _DemoState extends State<Demo> {
   static var now = DateTime.now();
   String date = DateFormat('dd-MM-yyyy').format(now);
-  bool p = false;
+  String p = '';
   List uu;
   String sdate = 'Not set';
 
@@ -28,7 +28,7 @@ class _DemoState extends State<Demo> {
     DocumentSnapshot doc = await documentRef.get();
     uu = doc.data['url'];
     setState(() {
-      p = true;
+      p = 'found';
     });
   }
 
@@ -38,10 +38,17 @@ class _DemoState extends State<Demo> {
     DocumentSnapshot doc = await documentRef.get();
     final ss =
         await Firestore.instance.collection("daily").document(givenDate).get();
-    if (ss.exists) uu = doc.data['url'];
-    setState(() {
-      p = true;
-    });
+    if (ss.exists) {
+      uu = doc.data['url'];
+      setState(() {
+        p = 'found';
+      });
+    } else {
+      setState(() {
+        p = 'dne';
+      });
+      print('.................NO>...............');
+    }
   }
 
   @override
@@ -60,49 +67,13 @@ class _DemoState extends State<Demo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.orangeAccent,
         centerTitle: true,
         title: Text('Daily Darshan'),
       ),
-      body: p
-          ? GridView.builder(
-              //crossAxisCount: 4,
-              itemCount: uu.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 0.0,
-                  mainAxisSpacing: 0.0),
-              itemBuilder: (BuildContext context, int index) => Container(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    color: Colors.white,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ImageFull(
-                              url: uu[index],
-                            ),
-                          ),
-                        );
-                      },
-                      child: CachedNetworkImage(
-                        imageUrl: uu[index],
-                        placeholder: (context, url) =>
-                            CircularProgressIndicator(),
-                        fit: BoxFit.fitWidth,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              //mainAxisSpacing: 0.0,
-              //crossAxisSpacing: 0.0,
-            )
-          : Center(child: CircularProgressIndicator()),
+      body: showThis(p),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.orangeAccent,
         child: Icon(Icons.calendar_today),
         onPressed: () {
           showDatePicker(
@@ -110,6 +81,19 @@ class _DemoState extends State<Demo> {
             initialDate: DateTime(2020, 04, 01),
             firstDate: DateTime(2020),
             lastDate: DateTime(2021),
+            builder: (BuildContext context, Widget child) {
+              return Theme(
+                data: ThemeData.light().copyWith(
+                  primaryColor: Colors.orangeAccent, //Head background
+                  accentColor: Colors.orangeAccent, //selection color
+                  colorScheme: ColorScheme.light(primary: Colors.orangeAccent),
+                  buttonTheme:
+                      ButtonThemeData(textTheme: ButtonTextTheme.primary),
+                  //dialogBackgroundColor: Colors.white,//Background color
+                ),
+                child: child,
+              );
+            },
           ).then((date) {
             setState(() {
               sdate = DateFormat('dd-MM-yyyy').format(date);
@@ -125,5 +109,55 @@ class _DemoState extends State<Demo> {
         },
       ),
     );
+  }
+
+  Widget showThis(String p) {
+    if (p == 'found') {
+      return GridView.builder(
+        //crossAxisCount: 4,
+        itemCount: uu.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2, crossAxisSpacing: 0.0, mainAxisSpacing: 0.0),
+        itemBuilder: (BuildContext context, int index) => Container(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              color: Colors.white,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ImageFull(
+                        url: uu[index],
+                      ),
+                    ),
+                  );
+                },
+                child: CachedNetworkImage(
+                  imageUrl: uu[index],
+                  placeholder: (context, url) => CircularProgressIndicator(),
+                  fit: BoxFit.fitWidth,
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        //mainAxisSpacing: 0.0,
+        //crossAxisSpacing: 0.0,
+      );
+    } else if (p == 'dne')
+      return Center(
+        child: Text(
+          'No Images Found!',
+          style: TextStyle(fontSize: 20),
+        ),
+      );
+    else
+      return Center(
+          child: CircularProgressIndicator(
+        valueColor: new AlwaysStoppedAnimation<Color>(Colors.orangeAccent),
+      ));
   }
 }

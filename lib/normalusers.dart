@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:login/demo.dart';
 // import 'package:login/picker.dart';
 
 // import 'addevent.dart';
@@ -114,6 +115,20 @@ class _NormalUsersState extends State<NormalUsers> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => Subscriptions(
+                        //widget._user,
+                        //widget._googleSignIn,
+                        ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Daily Darshan'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Demo(
                         //widget._user,
                         //widget._googleSignIn,
                         ),

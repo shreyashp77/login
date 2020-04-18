@@ -131,7 +131,10 @@ class _DailyDarshanState extends State<DailyDarshan> {
             ),
           ] else ...[
             Center(
-              child: Text('No Image Selected!'),
+              child: Text(
+                'No Image Selected!',
+                style: TextStyle(fontSize: 20),
+              ),
             ),
           ]
         ],
