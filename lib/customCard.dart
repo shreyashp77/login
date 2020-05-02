@@ -24,7 +24,7 @@ class CustomCard extends StatefulWidget {
   CustomCard(
       {@required this.title,
       @required this.description,
-      @required this.topic,
+      //@required this.topic,
       @required BuildContext context,
       @required this.isAdmin,
       @required this.ndate,
@@ -36,7 +36,7 @@ class CustomCard extends StatefulWidget {
 
   final title;
   final description;
-  final topic;
+  //final topic;
   final bool isAdmin;
   final ndate;
   final stime;
@@ -92,10 +92,10 @@ class _CustomCardState extends State<CustomCard> {
       // Crud().editEventData(topic,
       //     title: title, body: body, sdate: sdate, stime: stime);
       if (imgUrl.isNotEmpty)
-        Crud().addEventData(title, body, topic, desc, sdate, stime, category,
+        Crud().addEventData(title, body, desc, sdate, stime, category,
             url: imgUrl);
       else
-        Crud().addEventData(title, body, topic, desc, sdate, stime, category);
+        Crud().addEventData(title, body, desc, sdate, stime, category);
     }
 
     String convertTo12h(String hr, String mn) {
@@ -111,6 +111,8 @@ class _CustomCardState extends State<CustomCard> {
         ap = 'AM';
       } else
         ap = 'AM';
+
+      if (int.parse(mn) < 10) mn = '0' + mn;
 
       return (hrs.toString() + ':' + mn + ' ' + ap);
     }
@@ -483,7 +485,8 @@ class _CustomCardState extends State<CustomCard> {
                                     ),
                                     onPressed: () {
                                       if (_fKey.currentState.validate()) {
-                                        editEvent(topic);
+                                        Crud().deleteData(widget.desc);
+                                        editEvent(widget.desc);
                                         sendNotification();
                                         Navigator.pop(context);
                                         taskTitleInputController.clear();
@@ -506,7 +509,7 @@ class _CustomCardState extends State<CustomCard> {
         });
   }
 
-  _showAlertDialog(/*String topic*/) {
+  _showAlertDialog(String desc) {
     showDialog<String>(
       context: widget.c1,
       builder: (BuildContext context) => AlertDialog(
@@ -550,7 +553,7 @@ class _CustomCardState extends State<CustomCard> {
                                 color: Colors.orange.shade700, fontSize: 15),
                           ),
                           onPressed: () {
-                            Crud().deleteData(widget.topic);
+                            Crud().deleteData(widget.desc);
                             Navigator.pop(context);
                           },
                         ),
@@ -605,7 +608,7 @@ class _CustomCardState extends State<CustomCard> {
                       builder: (context) => DescriptionPage(
                         title: widget.title,
                         description: widget.description,
-                        topic: widget.topic,
+                        //topic: widget.topic,
                         ndate: widget.ndate,
                         stime: widget.stime,
                         url: widget.url,
@@ -625,7 +628,7 @@ class _CustomCardState extends State<CustomCard> {
             foregroundColor: Colors.white,
             icon: Icons.edit,
             onTap: () {
-              _showEditDialog(widget.topic);
+              _showEditDialog(widget.desc);
             },
           ),
         ],
@@ -635,7 +638,7 @@ class _CustomCardState extends State<CustomCard> {
             color: Colors.redAccent,
             icon: Icons.delete,
             onTap: () {
-              _showAlertDialog();
+              _showAlertDialog(widget.desc);
               //Crud().deleteData(widget.topic);
             },
           ),
@@ -669,7 +672,7 @@ class _CustomCardState extends State<CustomCard> {
                     builder: (context) => DescriptionPage(
                       title: widget.title,
                       description: widget.description,
-                      topic: widget.topic,
+                      //topic: widget.topic,
                       ndate: widget.ndate,
                       stime: widget.stime,
                       url: widget.url,

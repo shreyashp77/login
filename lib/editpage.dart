@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class DescriptionPage extends StatelessWidget {
   DescriptionPage(
       {@required this.title,
       @required this.description,
-      @required this.topic,
+      //@required this.topic,
       @required this.ndate,
       @required this.stime,
       this.url,
@@ -12,7 +13,7 @@ class DescriptionPage extends StatelessWidget {
 
   final title;
   final description;
-  final topic;
+  //final topic;
   final ndate;
   final stime;
   final url;
@@ -34,12 +35,15 @@ class DescriptionPage extends StatelessWidget {
               backgroundColor: Colors.orangeAccent,
               flexibleSpace: FlexibleSpaceBar(
                 centerTitle: true,
-                title: Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.0,
-                    // backgroundColor: Colors.orangeAccent,
+                title: FittedBox(
+                  fit: BoxFit.fitWidth,
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 19.0,
+                      // backgroundColor: Colors.orangeAccent,
+                    ),
                   ),
                 ),
                 background: Image.network(
@@ -77,7 +81,7 @@ class DescriptionPage extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 220,
+                    width: MediaQuery.of(context).size.width * 0.54,
                   ),
                   Text(
                     stime,

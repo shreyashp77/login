@@ -26,10 +26,24 @@ class _DemoState extends State<Demo> {
     DocumentReference documentRef =
         Firestore.instance.collection("daily").document(date);
     DocumentSnapshot doc = await documentRef.get();
-    uu = doc.data['url'];
-    setState(() {
-      p = 'found';
-    });
+    final ss2 =
+        await Firestore.instance.collection("daily").document(date).get();
+
+    if (ss2.exists) {
+      uu = doc.data['url'];
+      setState(() {
+        p = 'found';
+      });
+    } else {
+      setState(() {
+        p = 'dne';
+      });
+      print('.................NO>...............');
+    }
+    // uu = doc.data['url'];
+    // setState(() {
+    //   p = 'found';
+    // });
   }
 
   Future<void> differentDay(String givenDate) async {

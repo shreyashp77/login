@@ -68,18 +68,19 @@ class Crud {
   //   });
   // }
 
-  addEventData(String title, String body, String topic, String desc,
-      String sdate, String stime, String category,
+  addEventData(String title, String body, String desc, String sdate,
+      String stime, String category,
       {String url =
           "https://thelivenagpur.com/wp-content/uploads/2019/08/IMG-20190821-WA0031.jpg"}) async {
+    String comb = title + ' : ' + body;
     DocumentReference documentRef =
-        Firestore.instance.collection("notifications").document(topic);
+        Firestore.instance.collection("notifications").document(desc);
     Firestore.instance.runTransaction(
       (transaction) async {
         await documentRef.setData({
           'Title': title,
           'Body': body,
-          'Topic': topic,
+          //'Topic': topic,
           'Description': desc,
           'Date': sdate,
           'Time': stime,
@@ -114,14 +115,14 @@ class Crud {
     );
   }
 
-  deleteData(String topic) {
+  deleteData(String desc) {
     DocumentReference documentRef =
-        Firestore.instance.collection("notifications").document(topic);
+        Firestore.instance.collection("notifications").document(desc);
 
     Firestore.instance.runTransaction(
       (transaction) async {
         await documentRef.delete();
-        print("Notification Data added!");
+        print("Notification Data deleted!");
       },
     );
   }

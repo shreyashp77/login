@@ -123,7 +123,7 @@ class _NormalUsersState extends State<NormalUsers> {
               },
             ),
             ListTile(
-              title: Text('Daily Darshan'),
+              title: Text('View Daily Darshan'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -168,7 +168,7 @@ class _NormalUsersState extends State<NormalUsers> {
                         child: CustomCard(
                           title: document['Title'],
                           description: document['Body'],
-                          topic: document['Topic'],
+                          //topic: document['Topic'],
                           context: context,
                           isAdmin: false,
                           ndate: document['Date'],

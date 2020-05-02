@@ -16,6 +16,7 @@ import 'package:path/path.dart' as Path;
 import 'addaudio.dart';
 import 'crud.dart';
 import 'customCard.dart';
+import 'demo.dart';
 import 'message.dart';
 import 'msg.dart';
 
@@ -82,10 +83,10 @@ class _AdminPageState extends State<AdminPage> {
       String topic = topicInputController.text;
       String desc = descInputController.text;
       if (imgUrl.isNotEmpty)
-        Crud().addEventData(title, body, topic, desc, sdate, stime, category,
+        Crud().addEventData(title, body, desc, sdate, stime, category,
             url: imgUrl);
       else
-        Crud().addEventData(title, body, topic, desc, sdate, stime, category);
+        Crud().addEventData(title, body, desc, sdate, stime, category);
     }
 
     String convertTo12h(String hr, String mn) {
@@ -101,6 +102,8 @@ class _AdminPageState extends State<AdminPage> {
         ap = 'AM';
       } else
         ap = 'AM';
+
+      if (int.parse(mn) < 10) mn = '0' + mn;
 
       return (hrs.toString() + ':' + mn + ' ' + ap);
     }
@@ -151,18 +154,18 @@ class _AdminPageState extends State<AdminPage> {
                                 },
                               ),
                               //notUploaded(),
-                              TextFormField(
-                                decoration: InputDecoration(
-                                  hintText: 'Topic',
-                                ),
-                                controller: topicInputController,
-                                validator: (value) {
-                                  if (value.isEmpty) {
-                                    return 'Topic cannot be empty!';
-                                  }
-                                  return null;
-                                },
-                              ),
+                              // TextFormField(
+                              //   decoration: InputDecoration(
+                              //     hintText: 'Topic',
+                              //   ),
+                              //   controller: topicInputController,
+                              //   validator: (value) {
+                              //     if (value.isEmpty) {
+                              //       return 'Topic cannot be empty!';
+                              //     }
+                              //     return null;
+                              //   },
+                              // ),
                               TextFormField(
                                 decoration: InputDecoration(
                                   hintText: 'Description',
@@ -601,19 +604,33 @@ class _AdminPageState extends State<AdminPage> {
               },
             ),
             ListTile(
-              title: Text('Add Audio Stream'),
+              title: Text('View Daily Darshan'),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddAudio(
-                      widget._user,
-                      widget._googleSignIn,
-                    ),
+                    builder: (context) => Demo(
+                        //widget._user,
+                        //widget._googleSignIn,
+                        ),
                   ),
                 );
               },
             ),
+            // ListTile(
+            //   title: Text('Add Audio Stream'),
+            //   onTap: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //         builder: (context) => AddAudio(
+            //           widget._user,
+            //           widget._googleSignIn,
+            //         ),
+            //       ),
+            //     );
+            //   },
+            // ),
             ListTile(
               title: Text('Upload Daily Darshan'),
               onTap: () {
@@ -662,7 +679,7 @@ class _AdminPageState extends State<AdminPage> {
                         child: CustomCard(
                           title: document['Title'],
                           description: document['Body'],
-                          topic: document['Topic'],
+                          //topic: document['Topic'],
                           context: context,
                           isAdmin: true,
                           ndate: document['Date'],
