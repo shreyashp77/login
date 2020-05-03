@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 //Image Plugin
 import 'package:image_picker/image_picker.dart';
@@ -40,6 +41,7 @@ class _DailyDarshanState extends State<DailyDarshan> {
   List listUrl = [];
 
   String sdate = "Not set";
+  String sel_date = "Not set";
 
   @override
   void initState() {
@@ -79,7 +81,10 @@ class _DailyDarshanState extends State<DailyDarshan> {
                     ),
                   ),
                   ButtonTheme(
-                    child: Uploader(file: sampleImage),
+                    child: Uploader(
+                      file: sampleImage,
+                      sel_date: sel_date,
+                    ),
                   ),
                   ButtonTheme(
                     minWidth: MediaQuery.of(context).size.width * 0.4,
@@ -139,27 +144,78 @@ class _DailyDarshanState extends State<DailyDarshan> {
           ]
         ],
       ),
-      floatingActionButton: new FloatingActionButton(
-        backgroundColor: Colors.orangeAccent,
-        onPressed: () {
-          getImage();
-          // then((v) => setState(() {
-          //       imgUrl = v;
-          //       addTo(imgUrl);
-          //     }));
-          //addTo(imgUrl);
-        },
-        tooltip: 'Add Image',
-        child: new Icon(Icons.add_photo_alternate),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            IconButton(
+              icon: FaIcon(
+                FontAwesomeIcons.calendarAlt,
+                size: 30,
+              ),
+              onPressed: () {
+                showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2020),
+                  lastDate: DateTime(2021),
+                  builder: (BuildContext context, Widget child) {
+                    return Theme(
+                      data: ThemeData.light().copyWith(
+                        primaryColor: Colors.orangeAccent, //Head background
+                        accentColor: Colors.orangeAccent, //selection color
+                        colorScheme:
+                            ColorScheme.light(primary: Colors.orangeAccent),
+                        buttonTheme:
+                            ButtonThemeData(textTheme: ButtonTextTheme.primary),
+                        //dialogBackgroundColor: Colors.white,//Background color
+                      ),
+                      child: child,
+                    );
+                  },
+                ).then((date) {
+                  setState(() {
+                    sel_date = DateFormat('dd-MM-yyyy').format(date);
+                  });
+                  //print('date................' + sdate);
+                });
+              },
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.add_photo_alternate,
+                size: 30,
+              ),
+              onPressed: () {
+                getImage();
+              },
+            ),
+          ],
+        ),
       ),
+      // floatingActionButton: new FloatingActionButton(
+      //   backgroundColor: Colors.orangeAccent,
+      //   onPressed: () {
+      //     getImage();
+      //     // then((v) => setState(() {
+      //     //       imgUrl = v;
+      //     //       addTo(imgUrl);
+      //     //     }));
+      //     //addTo(imgUrl);
+      //   },
+      //   tooltip: 'Add Image',
+      //   child: new Icon(Icons.add_photo_alternate),
+      // ),
     );
   }
 }
 
 class Uploader extends StatefulWidget {
   final File file;
+  final sel_date;
 
-  const Uploader({Key key, this.file}) : super(key: key);
+  const Uploader({Key key, this.file, this.sel_date}) : super(key: key);
   @override
   _UploaderState createState() => _UploaderState();
 }
@@ -229,7 +285,7 @@ class _UploaderState extends State<Uploader> {
                 onPressed: () {
                   startUpload().then((v) => setState(() {
                         imgUrl = v;
-                        addTo(imgUrl);
+                        addTo(imgUrl, widget.sel_date);
                       }));
                   //addTo(imgUrl);
 
@@ -253,11 +309,17 @@ class _UploaderState extends State<Uploader> {
     return url;
   }
 
-  addTo(String url) async {
-    var now = DateTime.now();
-    String date = DateFormat('dd-MM-yyyy').format(now);
-    DocumentReference documentRef =
-        Firestore.instance.collection("daily").document(date);
+  addTo(String url, String sel_date) async {
+    String date;
+    DocumentReference documentRef;
+    if (sel_date == "Not set") {
+      var now = DateTime.now();
+      date = DateFormat('dd-MM-yyyy').format(now);
+      documentRef = Firestore.instance.collection("daily").document(date);
+    } else {
+      documentRef = Firestore.instance.collection("daily").document(sel_date);
+      date = sel_date;
+    }
 
     final ss =
         await Firestore.instance.collection("daily").document(date).get();

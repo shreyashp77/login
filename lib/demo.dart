@@ -92,7 +92,7 @@ class _DemoState extends State<Demo> {
         onPressed: () {
           showDatePicker(
             context: context,
-            initialDate: DateTime(2020, 04, 01),
+            initialDate: DateTime.now(),
             firstDate: DateTime(2020),
             lastDate: DateTime(2021),
             builder: (BuildContext context, Widget child) {
