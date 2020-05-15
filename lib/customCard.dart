@@ -181,7 +181,7 @@ class _CustomCardState extends State<CustomCard> {
                                 //elevation: 7.0,
                                 child: Text('Upload Image'),
                                 //textColor: Colors.white,
-                                color: Colors.orangeAccent,
+                                color: Colors.blue,
                                 onPressed: () {
                                   getImage().then((v) => setState(() {
                                         imgUrl = v;
@@ -480,8 +480,7 @@ class _CustomCardState extends State<CustomCard> {
                                   FlatButton(
                                     child: Text(
                                       'Edit',
-                                      style: TextStyle(
-                                          color: Colors.orange.shade700),
+                                      style: TextStyle(color: Colors.blue),
                                     ),
                                     onPressed: () {
                                       if (_fKey.currentState.validate()) {
@@ -624,7 +623,7 @@ class _CustomCardState extends State<CustomCard> {
         actions: <Widget>[
           new IconSlideAction(
             caption: 'Edit',
-            color: Colors.orangeAccent,
+            color: Colors.blue,
             foregroundColor: Colors.white,
             icon: Icons.edit,
             onTap: () {

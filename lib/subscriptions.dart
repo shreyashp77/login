@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:getflutter/getflutter.dart';
 // import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -78,9 +79,23 @@ class _SubscriptionsState extends State<Subscriptions> {
     return Scaffold(
       key: sk,
       appBar: AppBar(
-        title: Text('Subscriptions'),
+        title: Text(
+          'Subscriptions',
+          style: TextStyle(color: Colors.black),
+          //textScaleFactor: 1.2,
+        ),
         centerTitle: true,
-        backgroundColor: Colors.orangeAccent,
+        backgroundColor: Color(0xfffdfcfa),
+        //backgroundColor: Colors.white,
+        elevation: 0.5,
+        leading: IconButton(
+          icon: FaIcon(Icons.arrow_back_ios),
+          color: Colors.black,
+          iconSize: 35,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Column(
         children: <Widget>[
@@ -346,7 +361,7 @@ class _SubscriptionsState extends State<Subscriptions> {
             child: ListTile(
               title: Text('Topic 1'),
               trailing: CupertinoSwitch(
-                activeColor: Colors.orangeAccent,
+                activeColor: Colors.blue,
                 value: value1,
                 onChanged: (bool value) {
                   setState(() {
@@ -371,7 +386,7 @@ class _SubscriptionsState extends State<Subscriptions> {
             child: ListTile(
               title: Text('Topic 2'),
               trailing: CupertinoSwitch(
-                activeColor: Colors.orangeAccent,
+                activeColor: Colors.blue,
                 value: value2,
                 onChanged: (bool value) {
                   setState(() {
@@ -397,7 +412,7 @@ class _SubscriptionsState extends State<Subscriptions> {
             child: ListTile(
               title: Text('Topic 3'),
               trailing: CupertinoSwitch(
-                activeColor: Colors.orangeAccent,
+                activeColor: Colors.blue,
                 value: value3,
                 onChanged: (bool value) {
                   setState(() {
@@ -423,7 +438,7 @@ class _SubscriptionsState extends State<Subscriptions> {
             child: ListTile(
               title: Text('Topic 4'),
               trailing: CupertinoSwitch(
-                activeColor: Colors.orangeAccent,
+                activeColor: Colors.blue,
                 value: value4,
                 onChanged: (bool value) {
                   setState(() {

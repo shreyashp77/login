@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
 
@@ -81,33 +82,51 @@ class _DemoState extends State<Demo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.orangeAccent,
+        //backgroundColor: Colors.orangeAccent,
         centerTitle: true,
-        title: Text('Daily Darshan'),
+        title: Text(
+          'Daily Darshan',
+          style: TextStyle(color: Colors.black),
+        ),
+
+        backgroundColor: Color(0xfffdfcfa),
+
+        elevation: 0.5,
+        leading: IconButton(
+          icon: FaIcon(Icons.arrow_back_ios),
+          color: Colors.black,
+          iconSize: 35,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: showThis(p),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.orangeAccent,
-        child: Icon(Icons.calendar_today),
+        backgroundColor: Color(0xfffdfcfa),
+        child: FaIcon(
+          FontAwesomeIcons.calendarAlt,
+          color: Colors.black,
+        ),
         onPressed: () {
           showDatePicker(
             context: context,
             initialDate: DateTime.now(),
             firstDate: DateTime(2020),
             lastDate: DateTime(2021),
-            builder: (BuildContext context, Widget child) {
-              return Theme(
-                data: ThemeData.light().copyWith(
-                  primaryColor: Colors.orangeAccent, //Head background
-                  accentColor: Colors.orangeAccent, //selection color
-                  colorScheme: ColorScheme.light(primary: Colors.orangeAccent),
-                  buttonTheme:
-                      ButtonThemeData(textTheme: ButtonTextTheme.primary),
-                  //dialogBackgroundColor: Colors.white,//Background color
-                ),
-                child: child,
-              );
-            },
+            // builder: (BuildContext context, Widget child) {
+            //   return Theme(
+            //     data: ThemeData.light().copyWith(
+            //       primaryColor: Colors.orangeAccent, //Head background
+            //       accentColor: Colors.orangeAccent, //selection color
+            //       colorScheme: ColorScheme.light(primary: Colors.orangeAccent),
+            //       buttonTheme:
+            //           ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            //       //dialogBackgroundColor: Colors.white,//Background color
+            //     ),
+            //     child: child,
+            //   );
+            // },
           ).then((date) {
             setState(() {
               sdate = DateFormat('dd-MM-yyyy').format(date);
@@ -171,7 +190,7 @@ class _DemoState extends State<Demo> {
     else
       return Center(
           child: CircularProgressIndicator(
-        valueColor: new AlwaysStoppedAnimation<Color>(Colors.orangeAccent),
-      ));
+              //valueColor: new AlwaysStoppedAnimation<Color>(Colors.orangeAccent),
+              ));
   }
 }

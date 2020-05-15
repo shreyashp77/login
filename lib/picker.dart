@@ -56,9 +56,20 @@ class _DailyDarshanState extends State<DailyDarshan> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Upload Daily Darshan'),
+        title: Text(
+          'Upload Daily Darshan',
+          style: TextStyle(color: Colors.black),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.orangeAccent,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: FaIcon(Icons.arrow_back_ios),
+          color: Colors.black,
+          iconSize: 35,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,

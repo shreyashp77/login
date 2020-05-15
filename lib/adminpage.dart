@@ -7,12 +7,17 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:getflutter/getflutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:login/addaudio.dart';
 import 'package:login/makeadmin.dart';
 import 'package:login/picker.dart';
 import 'package:path/path.dart' as Path;
 
+import 'addaudio.dart';
 import 'addaudio.dart';
 import 'crud.dart';
 import 'customCard.dart';
@@ -38,6 +43,8 @@ class AdminPage extends StatefulWidget {
 }
 
 class _AdminPageState extends State<AdminPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   TextEditingController taskTitleInputController;
   TextEditingController taskDescripInputController;
   TextEditingController topicInputController;
@@ -187,7 +194,7 @@ class _AdminPageState extends State<AdminPage> {
                                 //elevation: 7.0,
                                 child: Text('Upload Image'),
                                 //textColor: Colors.white,
-                                color: Colors.orangeAccent,
+                                color: Colors.blue,
                                 onPressed: () {
                                   getImage().then((v) => setState(() {
                                         imgUrl = v;
@@ -481,8 +488,7 @@ class _AdminPageState extends State<AdminPage> {
                                       child: Text(
                                         'Add',
                                         style: TextStyle(
-                                            color: Colors.orangeAccent,
-                                            fontSize: 15),
+                                            color: Colors.blue, fontSize: 15),
                                       ),
                                       onPressed: () async {
                                         if (_fKey.currentState.validate()) {
@@ -564,13 +570,40 @@ class _AdminPageState extends State<AdminPage> {
         const IosNotificationSettings(sound: true, badge: true, alert: true));
   }
 
+  int counter = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Administration Page'),
-        centerTitle: true,
-        backgroundColor: Colors.orangeAccent,
+      key: _scaffoldKey,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(90.0),
+        child: AppBar(
+          //title: Text('Administration Page'),
+          centerTitle: true,
+          elevation: 0.7,
+          leading: IconButton(
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 22),
+              child: FaIcon(
+                FontAwesomeIcons.gopuram,
+                color: Colors.black,
+              ),
+            ),
+            onPressed: () => _scaffoldKey.currentState.openDrawer(),
+          ),
+          backgroundColor: Color(0xfffdfcfa),
+          title: Padding(
+            padding: const EdgeInsets.only(top: 34),
+            child: Text(
+              'Hare Krishna!',
+              textScaleFactor: 1.7,
+              style: GoogleFonts.courgette(
+                textStyle: TextStyle(color: Colors.black),
+              ),
+            ),
+          ),
+        ),
       ),
       drawer: Drawer(
         child: ListView(
@@ -590,6 +623,10 @@ class _AdminPageState extends State<AdminPage> {
               ),
             ),
             ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.userPlus,
+                size: 23.0,
+              ),
               title: Text('Add New Admin'),
               onTap: () {
                 Navigator.push(
@@ -603,7 +640,14 @@ class _AdminPageState extends State<AdminPage> {
                 );
               },
             ),
+            Divider(
+              thickness: 0.5,
+            ),
             ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.prayingHands,
+                size: 23.0,
+              ),
               title: Text('View Daily Darshan'),
               onTap: () {
                 Navigator.push(
@@ -623,15 +667,19 @@ class _AdminPageState extends State<AdminPage> {
             //     Navigator.push(
             //       context,
             //       MaterialPageRoute(
-            //         builder: (context) => AddAudio(
-            //           widget._user,
-            //           widget._googleSignIn,
-            //         ),
+            //         builder: (context) => MyApp(
+            //             //widget._user,
+            //             //widget._googleSignIn,
+            //             ),
             //       ),
             //     );
             //   },
             // ),
             ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.cloudUploadAlt,
+                size: 23.0,
+              ),
               title: Text('Upload Daily Darshan'),
               onTap: () {
                 Navigator.push(
@@ -645,8 +693,14 @@ class _AdminPageState extends State<AdminPage> {
                 );
               },
             ),
-            //Divider(),
+            Divider(
+              thickness: 0.5,
+            ),
             ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.signOutAlt,
+                size: 23.0,
+              ),
               title: Text('Logout'),
               onTap: () {
                 widget._googleSignIn.signOut();
@@ -656,7 +710,9 @@ class _AdminPageState extends State<AdminPage> {
                 );
               },
             ),
-            //Divider(),
+            Divider(
+              thickness: 0.5,
+            ),
           ],
         ),
       ),
@@ -698,8 +754,11 @@ class _AdminPageState extends State<AdminPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _showDialog,
         tooltip: 'Add',
-        child: Icon(Icons.add),
-        backgroundColor: Colors.orangeAccent,
+        child: FaIcon(
+          FontAwesomeIcons.bell,
+          color: Colors.black,
+        ),
+        backgroundColor: Color(0xfffdfcfa),
       ),
     );
   }

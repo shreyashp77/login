@@ -1,44 +1,35 @@
-//import 'package:audioplayer/audioplayer.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-//import 'package:chewie_audio/chewie_audio.dart';
-import 'package:url_audio_stream/url_audio_stream.dart';
 
-class AddAudio extends StatefulWidget {
-  GoogleSignIn _googleSignIn;
-  FirebaseUser _user;
-  AddAudio(FirebaseUser user, GoogleSignIn signIn) {
-    _user = user;
-    _googleSignIn = signIn;
-  }
+import 'package:just_audio/just_audio.dart';
+import 'package:rxdart/rxdart.dart';
 
+class MyApp extends StatefulWidget {
   @override
-  _AddAudioState createState() => _AddAudioState();
+  _MyAppState createState() => _MyAppState();
 }
 
-class _AddAudioState extends State<AddAudio> {
-  //String url = 'https://www.w3schools.com/tags/horse.mp3';
-
-  String _platformVersion = 'Unknown';
+class _MyAppState extends State<MyApp> {
+  final _volumeSubject = BehaviorSubject.seeded(1.0);
+  final _speedSubject = BehaviorSubject.seeded(1.0);
+  AudioPlayer _player;
 
   @override
   void initState() {
     super.initState();
+    _player = AudioPlayer();
+    _player
+        .setUrl(
+            "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3")
+        .catchError((error) {
+      // catch audio error ex: 404 url, wrong url ...
+      print(error);
+    });
   }
 
-  static AudioStream stream =
-      new AudioStream("https://www.w3schools.com/tags/horse.mp3");
-  Future<void> callAudio(String action) async {
-    if (action == "start") {
-      stream.start();
-    } else if (action == "stop") {
-      stream.stop();
-    } else if (action == "pause") {
-      stream.pause();
-    } else {
-      stream.resume();
-    }
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
   }
 
   @override
@@ -46,38 +37,155 @@ class _AddAudioState extends State<AddAudio> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Audio Player Demo'),
         ),
         body: Center(
-            child: Column(
-          children: <Widget>[
-            new RaisedButton(
-              child: new Text("Start"),
-              onPressed: () {
-                callAudio("start");
-              },
-            ),
-            new RaisedButton(
-              child: new Text("Stop"),
-              onPressed: () {
-                callAudio("stop");
-              },
-            ),
-            new RaisedButton(
-              child: new Text("Pause"),
-              onPressed: () {
-                callAudio("pause");
-              },
-            ),
-            new RaisedButton(
-              child: new Text("Resume"),
-              onPressed: () {
-                callAudio("resume");
-              },
-            )
-          ],
-        )),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Science Friday"),
+              Text("Science Friday and WNYC Studios"),
+              StreamBuilder<FullAudioPlaybackState>(
+                stream: _player.fullPlaybackStateStream,
+                builder: (context, snapshot) {
+                  final fullState = snapshot.data;
+                  final state = fullState?.state;
+                  final buffering = fullState?.buffering;
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (state == AudioPlaybackState.connecting ||
+                          buffering == true)
+                        Container(
+                          margin: EdgeInsets.all(8.0),
+                          width: 64.0,
+                          height: 64.0,
+                          child: CircularProgressIndicator(),
+                        )
+                      else if (state == AudioPlaybackState.playing)
+                        IconButton(
+                          icon: Icon(Icons.pause),
+                          iconSize: 64.0,
+                          onPressed: _player.pause,
+                        )
+                      else
+                        IconButton(
+                          icon: Icon(Icons.play_arrow),
+                          iconSize: 64.0,
+                          onPressed: _player.play,
+                        ),
+                      IconButton(
+                        icon: Icon(Icons.stop),
+                        iconSize: 64.0,
+                        onPressed: state == AudioPlaybackState.stopped ||
+                                state == AudioPlaybackState.none
+                            ? null
+                            : _player.stop,
+                      ),
+                    ],
+                  );
+                },
+              ),
+              Text("Track position"),
+              StreamBuilder<Duration>(
+                stream: _player.durationStream,
+                builder: (context, snapshot) {
+                  final duration = snapshot.data ?? Duration.zero;
+                  return StreamBuilder<Duration>(
+                    stream: _player.getPositionStream(),
+                    builder: (context, snapshot) {
+                      var position = snapshot.data ?? Duration.zero;
+                      if (position > duration) {
+                        position = duration;
+                      }
+                      return SeekBar(
+                        duration: duration,
+                        position: position,
+                        onChangeEnd: (newPosition) {
+                          _player.seek(newPosition);
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
+              Text("Volume"),
+              StreamBuilder<double>(
+                stream: _volumeSubject.stream,
+                builder: (context, snapshot) => Slider(
+                  divisions: 20,
+                  min: 0.0,
+                  max: 2.0,
+                  value: snapshot.data ?? 1.0,
+                  onChanged: (value) {
+                    _volumeSubject.add(value);
+                    _player.setVolume(value);
+                  },
+                ),
+              ),
+              Text("Speed"),
+              StreamBuilder<double>(
+                stream: _speedSubject.stream,
+                builder: (context, snapshot) => Slider(
+                  divisions: 10,
+                  min: 0.5,
+                  max: 1.5,
+                  value: snapshot.data ?? 1.0,
+                  onChanged: (value) {
+                    _speedSubject.add(value);
+                    _player.setSpeed(value);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
+    );
+  }
+}
+
+class SeekBar extends StatefulWidget {
+  final Duration duration;
+  final Duration position;
+  final ValueChanged<Duration> onChanged;
+  final ValueChanged<Duration> onChangeEnd;
+
+  SeekBar({
+    @required this.duration,
+    @required this.position,
+    this.onChanged,
+    this.onChangeEnd,
+  });
+
+  @override
+  _SeekBarState createState() => _SeekBarState();
+}
+
+class _SeekBarState extends State<SeekBar> {
+  double _dragValue;
+
+  @override
+  Widget build(BuildContext context) {
+    return Slider(
+      min: 0.0,
+      max: widget.duration.inMilliseconds.toDouble(),
+      value: _dragValue ?? widget.position.inMilliseconds.toDouble(),
+      onChanged: (value) {
+        setState(() {
+          _dragValue = value;
+        });
+        if (widget.onChanged != null) {
+          widget.onChanged(Duration(milliseconds: value.round()));
+        }
+      },
+      onChangeEnd: (value) {
+        _dragValue = null;
+        if (widget.onChangeEnd != null) {
+          widget.onChangeEnd(Duration(milliseconds: value.round()));
+        }
+      },
     );
   }
 }

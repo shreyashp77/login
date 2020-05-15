@@ -2,11 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:login/demo.dart';
 // import 'package:login/picker.dart';
 
 // import 'addevent.dart';
+import 'aboutus.dart';
+import 'contactus.dart';
 import 'customCard.dart';
 // import 'makeadmin.dart';
 import 'message.dart';
@@ -27,6 +31,15 @@ class NormalUsers extends StatefulWidget {
 }
 
 class _NormalUsersState extends State<NormalUsers> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  List imgList = [
+    'assets/images/c7.jpg',
+    'assets/images/c8.jpg',
+    'assets/images/c9.jpg',
+    'assets/images/c1.jpg'
+  ];
+
   TextEditingController taskTitleInputController;
   TextEditingController taskDescripInputController;
   TextEditingController topicInputController;
@@ -86,10 +99,33 @@ class _NormalUsersState extends State<NormalUsers> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Welcome!'),
-        centerTitle: true,
-        backgroundColor: Colors.orangeAccent,
+      key: _scaffoldKey,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(90.0),
+        child: AppBar(
+          elevation: 0.5,
+          leading: IconButton(
+            icon: Padding(
+              padding: const EdgeInsets.only(top: 22),
+              child: FaIcon(
+                FontAwesomeIcons.gopuram,
+                color: Colors.black,
+              ),
+            ),
+            onPressed: () => _scaffoldKey.currentState.openDrawer(),
+          ),
+          backgroundColor: Color(0xfffdfcfa),
+          title: Padding(
+            padding: const EdgeInsets.only(top: 34),
+            child: Text(
+              'Hare Krishna!',
+              textScaleFactor: 1.7,
+              style: GoogleFonts.courgette(
+                textStyle: TextStyle(color: Colors.black),
+              ),
+            ),
+          ),
+        ),
       ),
       drawer: Drawer(
         child: ListView(
@@ -100,7 +136,7 @@ class _NormalUsersState extends State<NormalUsers> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text('Welcome ${widget._user.displayName}'),
+                    Text('Welcome ${widget._user.displayName}!'),
                     CircleAvatar(
                       backgroundImage: NetworkImage(widget._user.photoUrl),
                     )
@@ -109,6 +145,10 @@ class _NormalUsersState extends State<NormalUsers> {
               ),
             ),
             ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.solidBell,
+                size: 23.0,
+              ),
               title: Text('Subscriptions'),
               onTap: () {
                 Navigator.push(
@@ -123,6 +163,10 @@ class _NormalUsersState extends State<NormalUsers> {
               },
             ),
             ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.prayingHands,
+                size: 23.0,
+              ),
               title: Text('View Daily Darshan'),
               onTap: () {
                 Navigator.push(
@@ -137,6 +181,70 @@ class _NormalUsersState extends State<NormalUsers> {
               },
             ),
             ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.plus,
+                size: 23.0,
+              ),
+              title: Text('Post Queries'),
+              onTap: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => PostQuery(
+                //         widget._user,
+                //         widget._googleSignIn,
+                //         ),
+                //   ),
+                // );
+              },
+            ),
+            Divider(
+              thickness: 0.5,
+            ),
+            ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.solidEnvelope,
+                size: 23.0,
+              ),
+              title: Text('Contact Us'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ContactScreen(
+                        //widget._user,
+                        //widget._googleSignIn,
+                        ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.infoCircle,
+                size: 23.0,
+              ),
+              title: Text('About ISKCON'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AboutUs(
+                        //widget._user,
+                        //widget._googleSignIn,
+                        ),
+                  ),
+                );
+              },
+            ),
+            Divider(
+              thickness: 0.5,
+            ),
+            ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.signOutAlt,
+                size: 23.0,
+              ),
               title: Text('Logout'),
               onTap: () {
                 widget._googleSignIn.signOut();
@@ -146,42 +254,44 @@ class _NormalUsersState extends State<NormalUsers> {
                 );
               },
             ),
+            Divider(
+              thickness: 0.5,
+            ),
           ],
         ),
       ),
-      body: Center(
-        child: Container(
-          padding: const EdgeInsets.all(10.0),
-          child: StreamBuilder<QuerySnapshot>(
-            stream: Firestore.instance.collection('notifications').snapshots(),
-            builder:
-                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-              switch (snapshot.connectionState) {
-                case ConnectionState.waiting:
-                  return Text('Loading...');
-                default:
-                  return ListView(
-                    children: snapshot.data.documents
-                        .map((DocumentSnapshot document) {
-                      return Card(
-                        child: CustomCard(
-                          title: document['Title'],
-                          description: document['Body'],
-                          //topic: document['Topic'],
-                          context: context,
-                          isAdmin: false,
-                          ndate: document['Date'],
-                          stime: document['Time'],
-                          url: document['URL'],
-                          desc: document['Description'],
-                        ),
-                      );
-                    }).toList(),
-                  );
-              }
-            },
-          ),
+      body: Container(
+        padding: const EdgeInsets.all(10.0),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: Firestore.instance.collection('notifications').snapshots(),
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return Text('Loading...');
+              default:
+                return ListView(
+                  children:
+                      snapshot.data.documents.map((DocumentSnapshot document) {
+                    return Card(
+                      color: Color(0xffffffff),
+                      child: CustomCard(
+                        title: document['Title'],
+                        description: document['Body'],
+                        //topic: document['Topic'],
+                        context: context,
+                        isAdmin: false,
+                        ndate: document['Date'],
+                        stime: document['Time'],
+                        url: document['URL'],
+                        desc: document['Description'],
+                      ),
+                    );
+                  }).toList(),
+                );
+            }
+          },
         ),
       ),
     );

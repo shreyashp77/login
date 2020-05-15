@@ -29,9 +29,20 @@ class _MakeAdminState extends State<MakeAdmin> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Make Admin'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          color: Colors.black,
+          iconSize: 35,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          'Make Admin',
+          style: TextStyle(color: Colors.black),
+        ),
         centerTitle: true,
-        backgroundColor: Colors.orangeAccent,
+        backgroundColor: Color(0xfffdfcfa),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -42,12 +53,12 @@ class _MakeAdminState extends State<MakeAdmin> {
             child: TextFormField(
               autofocus: true,
               controller: controller,
-              cursorColor: Colors.orangeAccent,
+              cursorColor: Colors.blue,
               decoration: InputDecoration(
                 labelStyle: TextStyle(color: Colors.orangeAccent),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: Colors.orangeAccent,
+                    color: Colors.blue,
                   ),
                 ),
               ),
@@ -64,7 +75,8 @@ class _MakeAdminState extends State<MakeAdmin> {
                 padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
                 child: RaisedButton(
                   shape: StadiumBorder(),
-                  color: Colors.orangeAccent,
+                  //borderSide: BorderSide(color: Colors.black),
+                  color: Colors.blue,
                   onPressed: () {
                     if (controller.text.isEmpty) {
                       _scaffoldKey.currentState.showSnackBar(
