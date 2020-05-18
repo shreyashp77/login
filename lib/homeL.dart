@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:login/adminpage.dart';
 import 'package:login/signup.dart';
+import 'package:random_color/random_color.dart';
 
 import 'normalusers.dart';
 
@@ -26,14 +27,28 @@ class _HomePageLState extends State<HomePageL> {
 
   @override
   Widget build(BuildContext context) {
+    RandomColor _randomColor1 = RandomColor();
+    Color _color1 = _randomColor1.randomColor(
+        colorSaturation: ColorSaturation.highSaturation,
+        colorHue: ColorHue.multiple(colorHues: <ColorHue>[ColorHue.blue]));
+
+    MyColor _myColor1 = getColorNameFromColor(_color1);
+    print(_myColor1.getName);
+
+    RandomColor _randomColor2 = RandomColor();
+    Color _color2 = _randomColor2.randomColor(
+        colorSaturation: ColorSaturation.highSaturation,
+        colorHue: ColorHue.multiple(colorHues: <ColorHue>[ColorHue.red]));
+    MyColor _myColor2 = getColorNameFromColor(_color2);
+    print(_myColor2.getName);
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
           colors: /*[Colors.orange.shade300, Colors.orange.shade800]*/ [
-            Color(0xffFDC830),
-            Color(0xfffc4a1a)
+            _color1,
+            _color2
           ],
         ),
       ),

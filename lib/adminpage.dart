@@ -13,10 +13,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:login/addaudio.dart';
+import 'package:login/addaudio.dart';
+import 'package:login/audio.dart';
+import 'package:login/audiolist.dart';
 import 'package:login/makeadmin.dart';
 import 'package:login/picker.dart';
 import 'package:path/path.dart' as Path;
 
+import 'addaudio.dart';
 import 'addaudio.dart';
 import 'addaudio.dart';
 import 'crud.dart';
@@ -661,20 +665,6 @@ class _AdminPageState extends State<AdminPage> {
                 );
               },
             ),
-            // ListTile(
-            //   title: Text('Add Audio Stream'),
-            //   onTap: () {
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(
-            //         builder: (context) => MyApp(
-            //             //widget._user,
-            //             //widget._googleSignIn,
-            //             ),
-            //       ),
-            //     );
-            //   },
-            // ),
             ListTile(
               leading: FaIcon(
                 FontAwesomeIcons.cloudUploadAlt,
@@ -686,6 +676,43 @@ class _AdminPageState extends State<AdminPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => DailyDarshan(
+                        //widget._user,
+                        //widget._googleSignIn,
+                        ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.podcast,
+                size: 28.0,
+              ),
+              title: Text('View Audio'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AudioList(
+                      isAdmin: true,
+                      //widget._user,
+                      //widget._googleSignIn,
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.microphoneAlt,
+                size: 28.0,
+              ),
+              title: Text('Upload Audio'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddAudio(
                         //widget._user,
                         //widget._googleSignIn,
                         ),
@@ -762,60 +789,6 @@ class _AdminPageState extends State<AdminPage> {
       ),
     );
   }
-
-  // Widget Upload() {
-  //   final StorageReference firebaseStorageRef = FirebaseStorage.instance
-  //       .ref()
-  //       .child('/events/${Path.basename(sampleImage.path)}');
-  //   final StorageUploadTask task = firebaseStorageRef.putFile(sampleImage);
-  //   if (task != null) {
-  //     /// Manage the task state and event subscription with a StreamBuilder
-  //     return StreamBuilder<StorageTaskEvent>(
-  //         stream: task.events,
-  //         builder: (_, snapshot) {
-  //           var event = snapshot?.data?.snapshot;
-
-  //           double progressPercent = event != null
-  //               ? event.bytesTransferred / event.totalByteCount
-  //               : 0;
-
-  //           return Column(
-  //             children: [
-  //               if (task.isComplete) Text('F.ile uploaded!'),
-
-  //               if (task.isPaused)
-  //                 FlatButton(
-  //                   child: Icon(Icons.play_arrow),
-  //                   onPressed: task.resume,
-  //                 ),
-
-  //               if (task.isInProgress)
-  //                 FlatButton(
-  //                   child: Icon(Icons.pause),
-  //                   onPressed: task.pause,
-  //                 ),
-
-  //               // Progress bar
-  //               LinearProgressIndicator(value: progressPercent),
-  //               Text('${(progressPercent * 100).toStringAsFixed(2)} % '),
-  //             ],
-  //           );
-  //         });
-  //   } else {
-  //     // Allows user to decide when to start the upload
-  //     return RaisedButton(
-  //       elevation: 7.0,
-  //       child: Text('Browse Image'),
-  //       textColor: Colors.white,
-  //       color: Colors.orangeAccent,
-  //       onPressed: () {
-  //         getImage(task).then((v) => setState(() {
-  //               imgUrl = v;
-  //             }));
-  //       },
-  //     );
-  //   }
-  // }
 
   Future sendNotification() async {
     final response = await Messaging.sendToTopic(

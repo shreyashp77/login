@@ -174,10 +174,9 @@ class _DailyDarshanState extends State<DailyDarshan> {
                   builder: (BuildContext context, Widget child) {
                     return Theme(
                       data: ThemeData.light().copyWith(
-                        primaryColor: Colors.orangeAccent, //Head background
-                        accentColor: Colors.orangeAccent, //selection color
-                        colorScheme:
-                            ColorScheme.light(primary: Colors.orangeAccent),
+                        primaryColor: Colors.blue, //Head background
+                        accentColor: Colors.blue, //selection color
+                        colorScheme: ColorScheme.light(primary: Colors.blue),
                         buttonTheme:
                             ButtonThemeData(textTheme: ButtonTextTheme.primary),
                         //dialogBackgroundColor: Colors.white,//Background color

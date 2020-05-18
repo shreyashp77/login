@@ -117,12 +117,26 @@ class Crud {
 
   deleteData(String desc) {
     DocumentReference documentRef =
-        Firestore.instance.collection("notifications").document(desc);
+        Firestore.instance.collection("audio").document(desc);
 
     Firestore.instance.runTransaction(
       (transaction) async {
         await documentRef.delete();
-        print("Notification Data deleted!");
+        print("Audio Data deleted!");
+      },
+    );
+  }
+
+  addAudioUrl(String name, String url) async {
+    DocumentReference documentRef =
+        Firestore.instance.collection("audio").document(name);
+    Firestore.instance.runTransaction(
+      (transaction) async {
+        await documentRef.setData({
+          'Name': name,
+          'URL': url,
+        });
+        print("Audio URL added!");
       },
     );
   }

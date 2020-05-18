@@ -47,6 +47,8 @@ dependencies:
   shared_preferences: any
   badges: ^1.1.1
   toast: ^0.1.5
+  random_color: ^1.0.5
+  file_picker: any
 
 dev_dependencies:
   flutter_test:

@@ -1,190 +1,297 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:file_picker/file_picker.dart';
 
-import 'package:just_audio/just_audio.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/fa_icon.dart';
+import 'package:http/http.dart' as http;
+import 'package:login/crud.dart';
 
-class MyApp extends StatefulWidget {
+class AddAudio extends StatefulWidget {
+  AddAudio() : super();
+
+  final String title = 'Upload Audio';
+
   @override
-  _MyAppState createState() => _MyAppState();
+  AddAudioState createState() => AddAudioState();
 }
 
-class _MyAppState extends State<MyApp> {
-  final _volumeSubject = BehaviorSubject.seeded(1.0);
-  final _speedSubject = BehaviorSubject.seeded(1.0);
-  AudioPlayer _player;
+class AddAudioState extends State<AddAudio> {
+  String fileUrl = "";
+  String name = "";
+  TextEditingController controller = TextEditingController();
+  String _path;
+  Map<String, String> _paths;
+  String _extension;
+  FileType _pickType = FileType.audio;
+  bool _multiPick = false;
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  List<StorageUploadTask> _tasks = <StorageUploadTask>[];
 
-  @override
-  void initState() {
-    super.initState();
-    _player = AudioPlayer();
-    _player
-        .setUrl(
-            "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3")
-        .catchError((error) {
-      // catch audio error ex: 404 url, wrong url ...
-      print(error);
+  void openFileExplorer() async {
+    name = controller.text;
+    _path = null;
+
+    _path = await FilePicker.getFilePath(type: _pickType);
+
+    uploadToFirebase(name);
+  }
+
+  uploadToFirebase(String name) {
+    String fileName = _path.split('/').last;
+    String filePath = _path;
+
+    upload(fileName, filePath).then((v) {
+      setState(() {
+        fileUrl = v;
+        Crud().addAudioUrl(name, fileUrl);
+      });
     });
   }
 
-  @override
-  void dispose() {
-    _player.dispose();
-    super.dispose();
+  Future<String> upload(fileName, filePath) async {
+    String uploadPath = '/audio/$fileName';
+    _extension = fileName.toString().split('.').last;
+    StorageReference storageRef =
+        FirebaseStorage.instance.ref().child(uploadPath);
+    final StorageUploadTask uploadTask = storageRef.putFile(File(filePath));
+    setState(() {
+      _tasks.add(uploadTask);
+    });
+    final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
+    final String url = (await downloadUrl.ref.getDownloadURL());
+
+    return url;
+  }
+
+  String _bytesTransferred(StorageTaskSnapshot snapshot) {
+    return '${snapshot.bytesTransferred}/${snapshot.totalByteCount}';
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Audio Player Demo'),
+    final List<Widget> children = <Widget>[];
+    _tasks.forEach((StorageUploadTask task) {
+      final Widget tile = UploadTaskListTile(
+        task: task,
+        onDismissed: () => setState(() => _tasks.remove(task)),
+        onDownload: () => downloadFile(task.lastSnapshot.ref),
+      );
+      children.add(tile);
+    });
+
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text(
+          widget.title,
+          style: TextStyle(color: Colors.black),
+          //textScaleFactor: 1.2,
         ),
-        body: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Science Friday"),
-              Text("Science Friday and WNYC Studios"),
-              StreamBuilder<FullAudioPlaybackState>(
-                stream: _player.fullPlaybackStateStream,
-                builder: (context, snapshot) {
-                  final fullState = snapshot.data;
-                  final state = fullState?.state;
-                  final buffering = fullState?.buffering;
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (state == AudioPlaybackState.connecting ||
-                          buffering == true)
-                        Container(
-                          margin: EdgeInsets.all(8.0),
-                          width: 64.0,
-                          height: 64.0,
-                          child: CircularProgressIndicator(),
-                        )
-                      else if (state == AudioPlaybackState.playing)
-                        IconButton(
-                          icon: Icon(Icons.pause),
-                          iconSize: 64.0,
-                          onPressed: _player.pause,
-                        )
-                      else
-                        IconButton(
-                          icon: Icon(Icons.play_arrow),
-                          iconSize: 64.0,
-                          onPressed: _player.play,
-                        ),
-                      IconButton(
-                        icon: Icon(Icons.stop),
-                        iconSize: 64.0,
-                        onPressed: state == AudioPlaybackState.stopped ||
-                                state == AudioPlaybackState.none
-                            ? null
-                            : _player.stop,
-                      ),
-                    ],
-                  );
-                },
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        leading: IconButton(
+          icon: FaIcon(Icons.arrow_back_ios),
+          color: Colors.black,
+          iconSize: 35,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: Container(
+        padding: EdgeInsets.fromLTRB(
+            20, MediaQuery.of(context).size.width * 0.7, 20, 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: TextFormField(
+                autofocus: true,
+                controller: controller,
+                cursorColor: Colors.blue,
+                decoration: InputDecoration(
+                  hintText: 'Name',
+                  labelStyle: TextStyle(color: Colors.orangeAccent),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.blue,
+                    ),
+                  ),
+                ),
               ),
-              Text("Track position"),
-              StreamBuilder<Duration>(
-                stream: _player.durationStream,
-                builder: (context, snapshot) {
-                  final duration = snapshot.data ?? Duration.zero;
-                  return StreamBuilder<Duration>(
-                    stream: _player.getPositionStream(),
-                    builder: (context, snapshot) {
-                      var position = snapshot.data ?? Duration.zero;
-                      if (position > duration) {
-                        position = duration;
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                ButtonTheme(
+                  minWidth: 250,
+                  padding: EdgeInsets.fromLTRB(0, 15, 0, 15),
+                  child: RaisedButton(
+                    shape: StadiumBorder(),
+                    //borderSide: BorderSide(color: Colors.black),
+                    color: Colors.blue,
+                    onPressed: () {
+                      if (controller.text.isEmpty) {
+                        _scaffoldKey.currentState.showSnackBar(
+                          SnackBar(
+                            content: Text('Name cannot be Empty!'),
+                            duration: Duration(seconds: 3),
+                          ),
+                        );
+                      } else {
+                        openFileExplorer();
                       }
-                      return SeekBar(
-                        duration: duration,
-                        position: position,
-                        onChangeEnd: (newPosition) {
-                          _player.seek(newPosition);
-                        },
-                      );
                     },
-                  );
-                },
-              ),
-              Text("Volume"),
-              StreamBuilder<double>(
-                stream: _volumeSubject.stream,
-                builder: (context, snapshot) => Slider(
-                  divisions: 20,
-                  min: 0.0,
-                  max: 2.0,
-                  value: snapshot.data ?? 1.0,
-                  onChanged: (value) {
-                    _volumeSubject.add(value);
-                    _player.setVolume(value);
-                  },
+                    child: Text(
+                      'Select Audio File',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
                 ),
-              ),
-              Text("Speed"),
-              StreamBuilder<double>(
-                stream: _speedSubject.stream,
-                builder: (context, snapshot) => Slider(
-                  divisions: 10,
-                  min: 0.5,
-                  max: 1.5,
-                  value: snapshot.data ?? 1.0,
-                  onChanged: (value) {
-                    _speedSubject.add(value);
-                    _player.setSpeed(value);
-                  },
+                SizedBox(
+                  width: 20,
                 ),
+              ],
+            ),
+            SizedBox(
+              height: 20.0,
+            ),
+            Flexible(
+              child: ListView(
+                children: children,
               ),
-            ],
-          ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> downloadFile(StorageReference ref) async {
+    final String url = await ref.getDownloadURL();
+    final http.Response downloadData = await http.get(url);
+    final Directory systemTempDir = Directory.systemTemp;
+    final File tempFile = File('${systemTempDir.path}/tmp.jpg');
+    if (tempFile.existsSync()) {
+      await tempFile.delete();
+    }
+    await tempFile.create();
+    final StorageFileDownloadTask task = ref.writeToFile(tempFile);
+    final int byteCount = (await task.future).totalByteCount;
+    var bodyBytes = downloadData.bodyBytes;
+    final String name = await ref.getName();
+    final String path = await ref.getPath();
+    print(
+      'Success!\nDownloaded $name \nUrl: $url'
+      '\npath: $path \nBytes Count :: $byteCount',
+    );
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.white,
+        content: Image.memory(
+          bodyBytes,
+          fit: BoxFit.fill,
         ),
       ),
     );
   }
 }
 
-class SeekBar extends StatefulWidget {
-  final Duration duration;
-  final Duration position;
-  final ValueChanged<Duration> onChanged;
-  final ValueChanged<Duration> onChangeEnd;
+class UploadTaskListTile extends StatelessWidget {
+  const UploadTaskListTile(
+      {Key key, this.task, this.onDismissed, this.onDownload})
+      : super(key: key);
 
-  SeekBar({
-    @required this.duration,
-    @required this.position,
-    this.onChanged,
-    this.onChangeEnd,
-  });
+  final StorageUploadTask task;
+  final VoidCallback onDismissed;
+  final VoidCallback onDownload;
 
-  @override
-  _SeekBarState createState() => _SeekBarState();
-}
+  String get status {
+    String result;
+    if (task.isComplete) {
+      if (task.isSuccessful) {
+        result = 'Complete';
+      } else if (task.isCanceled) {
+        result = 'Canceled';
+      } else {
+        result = 'Failed ERROR: ${task.lastSnapshot.error}';
+      }
+    } else if (task.isInProgress) {
+      result = 'Uploading';
+    } else if (task.isPaused) {
+      result = 'Paused';
+    }
+    return result;
+  }
 
-class _SeekBarState extends State<SeekBar> {
-  double _dragValue;
+  String _bytesTransferred(StorageTaskSnapshot snapshot) {
+    int d = snapshot.totalByteCount;
+    return ((snapshot.bytesTransferred / d) * 100).toStringAsFixed(1);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Slider(
-      min: 0.0,
-      max: widget.duration.inMilliseconds.toDouble(),
-      value: _dragValue ?? widget.position.inMilliseconds.toDouble(),
-      onChanged: (value) {
-        setState(() {
-          _dragValue = value;
-        });
-        if (widget.onChanged != null) {
-          widget.onChanged(Duration(milliseconds: value.round()));
+    return StreamBuilder<StorageTaskEvent>(
+      stream: task.events,
+      builder: (BuildContext context,
+          AsyncSnapshot<StorageTaskEvent> asyncSnapshot) {
+        Widget subtitle;
+        if (asyncSnapshot.hasData) {
+          final StorageTaskEvent event = asyncSnapshot.data;
+          final StorageTaskSnapshot snapshot = event.snapshot;
+          subtitle = Text('$status: ${_bytesTransferred(snapshot)}% uploaded');
+        } else {
+          subtitle = const Text('Starting...');
         }
-      },
-      onChangeEnd: (value) {
-        _dragValue = null;
-        if (widget.onChangeEnd != null) {
-          widget.onChangeEnd(Duration(milliseconds: value.round()));
-        }
+        return Dismissible(
+          key: Key(task.hashCode.toString()),
+          onDismissed: (_) => onDismissed(),
+          child: ListTile(
+            title: Text('Upload Task'),
+            subtitle: subtitle,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Offstage(
+                  offstage: !task.isInProgress,
+                  child: IconButton(
+                    icon: const Icon(Icons.pause),
+                    onPressed: () => task.pause(),
+                  ),
+                ),
+                Offstage(
+                  offstage: !task.isPaused,
+                  child: IconButton(
+                    icon: const Icon(Icons.file_upload),
+                    onPressed: () => task.resume(),
+                  ),
+                ),
+                Offstage(
+                  offstage: task.isComplete,
+                  child: IconButton(
+                    icon: const Icon(Icons.cancel),
+                    onPressed: () => task.cancel(),
+                  ),
+                ),
+                Offstage(
+                  offstage: !(task.isComplete && task.isSuccessful),
+                  child: IconButton(
+                    icon: const Icon(Icons.check),
+                    onPressed: () {},
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
       },
     );
   }

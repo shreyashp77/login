@@ -38,7 +38,7 @@ class _MakeAdminState extends State<MakeAdmin> {
           },
         ),
         title: Text(
-          'Make Admin',
+          'Add Admin',
           style: TextStyle(color: Colors.black),
         ),
         centerTitle: true,

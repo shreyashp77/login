@@ -10,6 +10,7 @@ import 'package:login/demo.dart';
 
 // import 'addevent.dart';
 import 'aboutus.dart';
+import 'audiolist.dart';
 import 'contactus.dart';
 import 'customCard.dart';
 // import 'makeadmin.dart';
@@ -182,22 +183,41 @@ class _NormalUsersState extends State<NormalUsers> {
             ),
             ListTile(
               leading: FaIcon(
-                FontAwesomeIcons.plus,
-                size: 23.0,
+                FontAwesomeIcons.podcast,
+                size: 28.0,
               ),
-              title: Text('Post Queries'),
+              title: Text('View Audio'),
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => PostQuery(
-                //         widget._user,
-                //         widget._googleSignIn,
-                //         ),
-                //   ),
-                // );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AudioList(
+                      isAdmin: false,
+                      //widget._user,
+                      //widget._googleSignIn,
+                    ),
+                  ),
+                );
               },
             ),
+            // ListTile(
+            //   leading: FaIcon(
+            //     FontAwesomeIcons.plus,
+            //     size: 23.0,
+            //   ),
+            //   title: Text('Post Queries'),
+            //   onTap: () {
+            //     // Navigator.push(
+            //     //   context,
+            //     //   MaterialPageRoute(
+            //     //     builder: (context) => PostQuery(
+            //     //         widget._user,
+            //     //         widget._googleSignIn,
+            //     //         ),
+            //     //   ),
+            //     // );
+            //   },
+            // ),
             Divider(
               thickness: 0.5,
             ),
