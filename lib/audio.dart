@@ -18,14 +18,14 @@ class _PlayAudioState extends State<PlayAudio> {
   final _volumeSubject = BehaviorSubject.seeded(1.0);
   final _speedSubject = BehaviorSubject.seeded(1.0);
   AudioPlayer _player;
-  String u =
-      "https://firebasestorage.googleapis.com/v0/b/login-demo-8c251.appspot.com/o/audio%2Fwii.mp3?alt=media&token=705a2fe5-4c67-428d-bdb9-f3db7faa9090";
+  String u;
+  //"https://firebasestorage.googleapis.com/v0/b/login-demo-8c251.appspot.com/o/audio%2Fwii.mp3?alt=media&token=705a2fe5-4c67-428d-bdb9-f3db7faa9090";
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
-    _player.setUrl(u).catchError((error) {
+    _player.setUrl(widget.url).catchError((error) {
       // catch audio error ex: 404 url, wrong url ...
       print(error);
     });

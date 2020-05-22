@@ -548,10 +548,10 @@ class _CustomCardState extends State<CustomCard> {
                         FlatButton(
                           child: Text(
                             'Yes',
-                            style: TextStyle(
-                                color: Colors.orange.shade700, fontSize: 15),
+                            style: TextStyle(color: Colors.blue, fontSize: 15),
                           ),
                           onPressed: () {
+                            //Crud().deleteData(widget.desc);
                             Crud().deleteData(widget.desc);
                             Navigator.pop(context);
                           },

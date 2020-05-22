@@ -87,7 +87,7 @@ class _CustomCardAudioState extends State<CustomCardAudio> {
                             style: TextStyle(color: Colors.blue, fontSize: 15),
                           ),
                           onPressed: () {
-                            Crud().deleteData(widget.name);
+                            Crud().deleteAudioData(widget.name);
                             Navigator.pop(context);
                           },
                         ),

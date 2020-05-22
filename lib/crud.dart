@@ -42,7 +42,8 @@ class Crud {
         'Name': user.displayName,
         'Email': user.email,
         'admin': false,
-        'uid': user.uid
+        'uid': user.uid,
+        'progress': 0.25,
       });
       print("instance created");
     });
@@ -117,6 +118,18 @@ class Crud {
 
   deleteData(String desc) {
     DocumentReference documentRef =
+        Firestore.instance.collection("notifications").document(desc);
+
+    Firestore.instance.runTransaction(
+      (transaction) async {
+        await documentRef.delete();
+        print("Notification Data deleted!");
+      },
+    );
+  }
+
+  deleteAudioData(String desc) {
+    DocumentReference documentRef =
         Firestore.instance.collection("audio").document(desc);
 
     Firestore.instance.runTransaction(
@@ -139,5 +152,64 @@ class Crud {
         print("Audio URL added!");
       },
     );
+  }
+
+  updateName(FirebaseUser user, String name) async {
+    DocumentReference documentRef =
+        Firestore.instance.collection("users").document(user.uid);
+    Firestore.instance.runTransaction((transaction) async {
+      await documentRef.updateData({
+        'Name': name,
+        'Phone': user.phoneNumber,
+      });
+      print("Name Updated");
+    });
+  }
+
+  updateAddress(FirebaseUser user, String address) async {
+    DocumentReference documentRef =
+        Firestore.instance.collection("users").document(user.uid);
+    Firestore.instance.runTransaction((transaction) async {
+      await documentRef.updateData({
+        'Address': address,
+        'Phone': user.phoneNumber,
+      });
+      print("Address Updated");
+    });
+  }
+
+  updateDOB(FirebaseUser user, String dob) async {
+    DocumentReference documentRef =
+        Firestore.instance.collection("users").document(user.uid);
+    Firestore.instance.runTransaction((transaction) async {
+      await documentRef.updateData({
+        'DOB': dob,
+        'Phone': user.phoneNumber,
+      });
+      print("DOB Updated");
+    });
+  }
+
+  updateGender(FirebaseUser user, String gender) async {
+    DocumentReference documentRef =
+        Firestore.instance.collection("users").document(user.uid);
+    Firestore.instance.runTransaction((transaction) async {
+      await documentRef.updateData({
+        'Gender': gender,
+        'Phone': user.phoneNumber,
+      });
+      print("Gender Updated");
+    });
+  }
+
+  updateProgress(FirebaseUser user, String progress) async {
+    DocumentReference documentRef =
+        Firestore.instance.collection("users").document(user.uid);
+    Firestore.instance.runTransaction((transaction) async {
+      await documentRef.updateData({
+        'progress': progress,
+      });
+      print("Gender Updated");
+    });
   }
 }

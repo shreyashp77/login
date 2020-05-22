@@ -69,7 +69,6 @@ class _SubscriptionsState extends State<Subscriptions> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _loadswitchValue();
   }

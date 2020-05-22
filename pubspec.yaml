@@ -49,6 +49,7 @@ dependencies:
   toast: ^0.1.5
   random_color: ^1.0.5
   file_picker: any
+  #upi_india: ^2.0.0
 
 dev_dependencies:
   flutter_test:

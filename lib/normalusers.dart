@@ -6,6 +6,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:login/demo.dart';
+import 'package:login/donate.dart';
+import 'package:login/editprofile.dart';
 // import 'package:login/picker.dart';
 
 // import 'addevent.dart';
@@ -32,14 +34,20 @@ class NormalUsers extends StatefulWidget {
 }
 
 class _NormalUsersState extends State<NormalUsers> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  dynamic data;
 
-  List imgList = [
-    'assets/images/c7.jpg',
-    'assets/images/c8.jpg',
-    'assets/images/c9.jpg',
-    'assets/images/c1.jpg'
-  ];
+  Future<dynamic> getUserName() async {
+    final DocumentReference document =
+        Firestore.instance.collection("users").document(widget._user.uid);
+
+    await document.get().then<dynamic>((DocumentSnapshot snapshot) async {
+      setState(() {
+        data = snapshot.data;
+      });
+    });
+  }
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   TextEditingController taskTitleInputController;
   TextEditingController taskDescripInputController;
@@ -54,6 +62,8 @@ class _NormalUsersState extends State<NormalUsers> {
     taskTitleInputController = TextEditingController();
     taskDescripInputController = TextEditingController();
     topicInputController = TextEditingController();
+    getUserName();
+
     super.initState();
 
     _firebaseMessaging.onTokenRefresh.listen(sendTokenToServer);
@@ -137,7 +147,7 @@ class _NormalUsersState extends State<NormalUsers> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text('Welcome ${widget._user.displayName}!'),
+                    Text("Welcome " + data['Name'] + "!"),
                     CircleAvatar(
                       backgroundImage: NetworkImage(widget._user.photoUrl),
                     )
@@ -148,7 +158,7 @@ class _NormalUsersState extends State<NormalUsers> {
             ListTile(
               leading: FaIcon(
                 FontAwesomeIcons.solidBell,
-                size: 23.0,
+                size: 25.0,
               ),
               title: Text('Subscriptions'),
               onTap: () {
@@ -200,6 +210,25 @@ class _NormalUsersState extends State<NormalUsers> {
                 );
               },
             ),
+            ListTile(
+              leading: FaIcon(
+                FontAwesomeIcons.userEdit,
+                size: 28.0,
+              ),
+              title: Text('Edit Profile'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditProfile(
+                        //isAdmin: false,
+                        //widget._user,
+                        //widget._googleSignIn,
+                        ),
+                  ),
+                );
+              },
+            ),
             // ListTile(
             //   leading: FaIcon(
             //     FontAwesomeIcons.plus,
@@ -221,6 +250,24 @@ class _NormalUsersState extends State<NormalUsers> {
             Divider(
               thickness: 0.5,
             ),
+            // ListTile(
+            //   onTap: () {
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(
+            //         builder: (context) => Donation(
+            //             //widget._user,
+            //             //widget._googleSignIn,
+            //             ),
+            //       ),
+            //     );
+            //   },
+            //   leading: FaIcon(
+            //     FontAwesomeIcons.rupeeSign,
+            //     size: 25.0,
+            //   ),
+            //   title: Text('Donate'),
+            // ),
             ListTile(
               leading: FaIcon(
                 FontAwesomeIcons.solidEnvelope,
