@@ -87,8 +87,22 @@ class Crud {
           'Time': stime,
           'Category': category,
           'URL': url,
+          'createdAt': Timestamp.now(),
         });
         print("Notification Data added!");
+      },
+    );
+  }
+
+  addVideoUrl(String url) async {
+    DocumentReference documentRef =
+        Firestore.instance.collection("video").document("videoUrl");
+    Firestore.instance.runTransaction(
+      (transaction) async {
+        await documentRef.setData({
+          'URL': url,
+        });
+        print("Youtube Video added!");
       },
     );
   }

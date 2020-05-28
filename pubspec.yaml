@@ -50,6 +50,7 @@ dependencies:
   random_color: ^1.0.5
   file_picker: any
   #upi_india: ^2.0.0
+  youtube_player_flutter: any
 
 dev_dependencies:
   flutter_test:

@@ -8,9 +8,18 @@ import 'package:random_color/random_color.dart';
 import 'crud.dart';
 import 'homeL.dart';
 
-class Welcome extends StatelessWidget {
+class Welcome extends StatefulWidget {
+  @override
+  _WelcomeState createState() => _WelcomeState();
+}
+
+class _WelcomeState extends State<Welcome> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     RandomColor _randomColor1 = RandomColor();
@@ -54,25 +63,34 @@ class Welcome extends StatelessWidget {
               height: 200,
               width: 200,
             ),
-            ButtonTheme(
-              minWidth: 300,
-              child: OutlineButton(
-                padding: EdgeInsets.symmetric(vertical: 15),
-                shape: StadiumBorder(),
-                textColor: Colors.white,
-                borderSide: BorderSide(color: Colors.white),
-                onPressed: () {
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => Login(),
-                  //       fullscreenDialog: true,
-                  //     ));
-                  onGoogleSignIn(context);
-                },
-                child: Text('Login'),
-              ),
-            ),
+            isLoading
+                ? Center(child: CircularProgressIndicator())
+                : ButtonTheme(
+                    minWidth: 300,
+                    child: OutlineButton(
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      shape: StadiumBorder(),
+                      textColor: Colors.white,
+                      borderSide: BorderSide(color: Colors.white),
+                      onPressed: () async {
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //       builder: (context) => Login(),
+                        //       fullscreenDialog: true,
+                        //     ));
+                        //await Future.delayed(const Duration(seconds: 2));
+                        setState(() {
+                          isLoading = true;
+                        });
+                        await onGoogleSignIn(context);
+                        setState(() {
+                          isLoading = false;
+                        });
+                      },
+                      child: Text('Login'),
+                    ),
+                  ),
             // GestureDetector(
             //   onTap: () {
             //     print("onTap called.");
@@ -89,25 +107,27 @@ class Welcome extends StatelessWidget {
             SizedBox(
               height: 8,
             ),
-            ButtonTheme(
-              minWidth: 300,
-              child: OutlineButton(
-                padding: EdgeInsets.symmetric(vertical: 15),
-                borderSide: BorderSide(color: Colors.white),
-                shape: StadiumBorder(),
-                textColor: Colors.white,
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Signup(),
-                        fullscreenDialog: true,
-                      ));
-                  //onGoogleSignIn(context);
-                },
-                child: Text('Signup'),
-              ),
-            ),
+            isLoading
+                ? SizedBox()
+                : ButtonTheme(
+                    minWidth: 300,
+                    child: OutlineButton(
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      borderSide: BorderSide(color: Colors.white),
+                      shape: StadiumBorder(),
+                      textColor: Colors.white,
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Signup(),
+                              fullscreenDialog: true,
+                            ));
+                        //onGoogleSignIn(context);
+                      },
+                      child: Text('Signup'),
+                    ),
+                  ),
             // RaisedButton(
             //   onPressed: () {
             //     Navigator.push(

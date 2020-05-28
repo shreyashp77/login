@@ -330,7 +330,10 @@ class _NormalUsersState extends State<NormalUsers> {
       body: Container(
         padding: const EdgeInsets.all(10.0),
         child: StreamBuilder<QuerySnapshot>(
-          stream: Firestore.instance.collection('notifications').snapshots(),
+          stream: Firestore.instance
+              .collection('notifications')
+              .orderBy('createdAt', descending: true)
+              .snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) return Text('Error: ${snapshot.error}');

@@ -18,11 +18,13 @@ import 'package:login/audio.dart';
 import 'package:login/audiolist.dart';
 import 'package:login/makeadmin.dart';
 import 'package:login/picker.dart';
+import 'package:login/viewvideo.dart';
 import 'package:path/path.dart' as Path;
 
 import 'addaudio.dart';
 import 'addaudio.dart';
 import 'addaudio.dart';
+import 'addvideo.dart';
 import 'crud.dart';
 import 'customCard.dart';
 import 'demo.dart';
@@ -497,10 +499,12 @@ class _AdminPageState extends State<AdminPage> {
                                       onPressed: () async {
                                         if (_fKey.currentState.validate()) {
                                           Navigator.pop(context);
+
                                           await Future.delayed(
                                               const Duration(seconds: 5));
-                                          addEvent();
-                                          sendNotification();
+                                          await addEvent();
+                                          await sendNotification();
+
                                           //enableUpload(/*topic*/);
                                           taskTitleInputController.clear();
                                           taskDescripInputController.clear();
@@ -720,6 +724,42 @@ class _AdminPageState extends State<AdminPage> {
                 );
               },
             ),
+            ListTile(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddVideo(
+                        //widget._user,
+                        //widget._googleSignIn,
+                        ),
+                  ),
+                );
+              },
+              leading: FaIcon(
+                FontAwesomeIcons.youtube,
+                size: 23.0,
+              ),
+              title: Text('Add Video'),
+            ),
+            ListTile(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => VideosPage(
+                        //widget._user,
+                        //widget._googleSignIn,
+                        ),
+                  ),
+                );
+              },
+              leading: FaIcon(
+                FontAwesomeIcons.video,
+                size: 23.0,
+              ),
+              title: Text('Latest Video'),
+            ),
             Divider(
               thickness: 0.5,
             ),
@@ -747,7 +787,10 @@ class _AdminPageState extends State<AdminPage> {
         child: Container(
           padding: const EdgeInsets.all(10.0),
           child: StreamBuilder<QuerySnapshot>(
-            stream: Firestore.instance.collection('notifications').snapshots(),
+            stream: Firestore.instance
+                .collection('notifications')
+                .orderBy('createdAt', descending: true)
+                .snapshots(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasError) return Text('Error: ${snapshot.error}');
