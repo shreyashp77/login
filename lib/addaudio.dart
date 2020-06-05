@@ -82,6 +82,7 @@ class AddAudioState extends State<AddAudio> {
 
     return Scaffold(
       key: _scaffoldKey,
+      resizeToAvoidBottomPadding: false,
       appBar: AppBar(
         title: Text(
           widget.title,

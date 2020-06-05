@@ -94,15 +94,30 @@ class Crud {
     );
   }
 
-  addVideoUrl(String url) async {
+  addVideoUrl(String url, bool isLive, /*bool showIcon*/) async {
     DocumentReference documentRef =
         Firestore.instance.collection("video").document("videoUrl");
     Firestore.instance.runTransaction(
       (transaction) async {
         await documentRef.setData({
           'URL': url,
+          'live': isLive,
+          //'show': showIcon,
         });
         print("Youtube Video added!");
+      },
+    );
+  }
+  showIcon(bool isLive) async {
+    DocumentReference documentRef =
+        Firestore.instance.collection("video").document("videoUrl");
+    Firestore.instance.runTransaction(
+      (transaction) async {
+        await documentRef.setData({
+          'live': isLive,
+          //'show': showIcon,
+        });
+        print("Icon State Changed!");
       },
     );
   }

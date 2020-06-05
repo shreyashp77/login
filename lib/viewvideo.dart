@@ -1,9 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/fa_icon.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
+import 'crud.dart';
+
 class VideosPage extends StatefulWidget {
+  final bool isAdmin;
+
+  const VideosPage({Key key, @required this.isAdmin}) : super(key: key);
   @override
   _VideosPageState createState() => _VideosPageState();
 }
@@ -13,27 +20,66 @@ class _VideosPageState extends State<VideosPage> {
   //     "https://www.youtube.com/watch?v=BBAyRBTfsOU");
 
   String url;
-  String videoId;
+  bool isLive;
+  //String videoId;
   YoutubePlayerController _controller;
 
-  @override
-  void initState() {
+  getUrl() async {
+    String url;
+    bool isLive;
     Firestore.instance
         .collection('video')
         .document('videoUrl')
         .get()
         .then((DocumentSnapshot ds) {
-      url = ds['URL'];
-      videoId = YoutubePlayer.convertUrlToId(url);
-    });
-    _controller = YoutubePlayerController(
-      initialVideoId: videoId,
+          setState(() {
+            url = ds['URL'];
+            isLive = ds['live'];
+            print(url+isLive.toString());   
+            _controller = YoutubePlayerController(
+      initialVideoId: url,
       flags: YoutubePlayerFlags(
         autoPlay: true,
-        mute: true,
+        mute: false,
+        isLive: isLive,
       ),
-    );
+    )..addListener(listener);   
+          });
+    });
+    //return url;
+  }
+
+ 
+ 
+
+  @override
+  void initState() {
+    getUrl().then((value) {
+      setState(() {
+      
+      print(url+" ghjk");
+      
+    });
+    });
+    
+    
     super.initState();
+  }
+
+  
+  PlayerState _playerState;
+  YoutubeMetaData _videoMetaData;
+  double _volume = 100;
+  bool _muted = false;
+  bool _isPlayerReady = false;
+  
+  void listener() {
+    if (_isPlayerReady && mounted && !_controller.value.isFullScreen) {
+      setState(() {
+        _playerState = _controller.value.playerState;
+        _videoMetaData = _controller.metadata;
+      });
+    }
   }
 
   @override
@@ -42,9 +88,11 @@ class _VideosPageState extends State<VideosPage> {
       appBar: AppBar(
         title: Text(
           'Latest Videos',
+          
           style: TextStyle(color: Colors.black),
           textScaleFactor: 1.2,
         ),
+        centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0.5,
         leading: IconButton(

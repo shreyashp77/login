@@ -29,7 +29,9 @@ dependencies:
   google_sign_in: any
   firebase_messaging: any
   flutter_slidable: ^0.5.4
-  flutter_datetime_picker: any
+  flutter_datetime_picker:
+    git:
+      url: https://github.com/derohimat/flutter_datetime_picker.git
   font_awesome_flutter: any
   google_fonts: any
   # video_player: any

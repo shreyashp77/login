@@ -63,6 +63,8 @@ class _AdminPageState extends State<AdminPage> {
   //var topic;
   String imgUrl = "";
 
+  
+
   final _fKey = GlobalKey<FormState>();
 
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -576,6 +578,9 @@ class _AdminPageState extends State<AdminPage> {
     );
     _firebaseMessaging.requestNotificationPermissions(
         const IosNotificationSettings(sound: true, badge: true, alert: true));
+
+    
+    
   }
 
   int counter = 0;
@@ -615,7 +620,8 @@ class _AdminPageState extends State<AdminPage> {
       ),
       drawer: Drawer(
         child: ListView(
-          children: <Widget>[
+          children:
+          <Widget>[
             Container(
               height: 75,
               child: DrawerHeader(
@@ -748,8 +754,7 @@ class _AdminPageState extends State<AdminPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => VideosPage(
-                        //widget._user,
-                        //widget._googleSignIn,
+                      isAdmin: true,
                         ),
                   ),
                 );
@@ -780,7 +785,8 @@ class _AdminPageState extends State<AdminPage> {
             Divider(
               thickness: 0.5,
             ),
-          ],
+          ] 
+        
         ),
       ),
       body: Center(

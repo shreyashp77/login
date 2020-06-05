@@ -8,6 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:login/demo.dart';
 import 'package:login/donate.dart';
 import 'package:login/editprofile.dart';
+import 'package:login/viewvideo.dart';
 // import 'package:login/picker.dart';
 
 // import 'addevent.dart';
@@ -209,6 +210,23 @@ class _NormalUsersState extends State<NormalUsers> {
                   ),
                 );
               },
+            ),
+            ListTile(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => VideosPage(
+                      isAdmin: false,
+                        ),
+                  ),
+                );
+              },
+              leading: FaIcon(
+                FontAwesomeIcons.youtube,
+                size: 23.0,
+              ),
+              title: Text('Latest Video'),
             ),
             ListTile(
               leading: FaIcon(
